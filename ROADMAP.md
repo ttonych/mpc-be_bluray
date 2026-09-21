@@ -19,8 +19,10 @@ items below are not promised release dates or compatibility guarantees.
 
 The source is public and `main` is protected. The
 [first cloud build](https://github.com/ttonych/mpc-be_bluray/actions/runs/35601595821)
-passed, and its ZIP integrity and clean profile were checked. The playback results
-above are from local builds; cloud-package playback tests and the release are pending.
+passed, and its ZIP integrity and clean profile were checked. The later branded
+cloud candidate passed user checks on A Knight’s Tale (BD-J) and Baby Boom (HDMV).
+Grand Prix exposed missing separate menu audio and a failed-read recovery crash;
+the local fixes require a new cloud candidate before publication.
 
 ## Before 1.9.1-bluray.1
 
@@ -63,7 +65,8 @@ preserved and all temporary registry keys were removed.
 The branded cloud candidate also passed RU/EN first-run and About checks,
 including setup cancellation and an unchanged installed registry profile.
 Its build commit and checksum are recorded in the development guide. A draft
-Release holds the same ZIP; disc playback validation is still pending.
+Release holds the same ZIP. A Knight’s Tale and Baby Boom passed user playback
+checks; the Grand Prix fixes still need inclusion and validation in a new ZIP.
 
 ## After initial feedback
 

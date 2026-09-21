@@ -216,6 +216,14 @@ to `main`. Build and test the cloud candidate before tagging a public release.
 
 ## Updating libbluray
 
+Still-menu primary audio uses `bd_read_mpls` and the pinned 1.5.0
+`mpls_data.h` / `uo_mask_table.h` headers under `include/libbluray/bdnav`.
+These are unmodified upstream headers, including their license notices. Their
+structure layout is not a stable public ABI: review it when changing libbluray.
+The player accepts only the pinned library version. The original STN entries
+are needed because 1.5.0 title info repeats the first stream’s subpath ID and
+does not expose the subclip ID. No additional library patch is required.
+
 Use a separate `update/libbluray-<version>` branch and a reviewed PR, following
 the same local-first process as MPC-BE updates.
 

@@ -8,6 +8,7 @@
 #include "BlurayMenuColor.h"
 #include "BlurayMenuRle.h"
 #include "BlurayMenuBackground.h"
+#include "BlurayMenuAudioPlayer.h"
 #include "BluraySettings.h"
 #include "BlurayDiscStorage.h"
 #include "BlurayCatalog.h"
@@ -25,6 +26,7 @@
     X(bd_get_version) X(bd_open) X(bd_close) X(bd_get_disc_info) \
     X(bd_get_event) X(bd_register_overlay_proc) X(bd_play) X(bd_read_ext) \
     X(bd_set_player_setting_str) X(bd_get_playlist_info) X(bd_free_title_info) \
+    X(bd_read_mpls) X(bd_free_mpls) \
     X(bd_tell_time) X(bd_set_scr) X(bd_user_input) X(bd_mouse_select) \
     X(bd_read_skip_still) X(bd_seek_time) X(bd_mouse_select_page) \
     X(bd_init) X(bd_open_disc) X(bd_set_player_setting) X(bd_register_argb_overlay_proc)
@@ -61,6 +63,8 @@ struct CBlurayMenu::State
     unsigned playitem = 0, audioStream = 255, pgStream = 4095;
     bool pgEnabled = false, streamsDirty = false;
     int lastAudioPid = -2, lastSubtitlePid = -2;
+    MPLS_PL* audioPlaylist = nullptr;
+    BlurayMenuAudioPlayer menuAudio;
     UINT stillSeconds = 0;
     ULONGLONG stillUntil = 0;
     REFERENCE_TIME lastPosition = -1, pendingSeek = -1;
@@ -136,6 +140,8 @@ struct CBlurayMenu::State
         osd.Release(); command.Release(); redrawsPending = 0;
     }
     ~State() {
+        menuAudio.Reset();
+        if (audioPlaylist) bd_free_mpls(audioPlaylist);
         media.Stop();
         Detach();
         if (title) bd_free_title_info(title);
@@ -322,6 +328,10 @@ struct CBlurayMenu::State
             break;
         }
         case BD_EVENT_PLAYLIST:
+            // Release the menu's audio device before the film graph is built.
+            menuAudio.Reset();
+            if (audioPlaylist) bd_free_mpls(audioPlaylist);
+            audioPlaylist = nullptr;
             clock.Reset();
             playitem = 0;
             segmentStop = 0;
@@ -332,11 +342,13 @@ struct CBlurayMenu::State
             stillUntil = 0; lastPosition = -1; pendingSeek = -1;
             if (title) bd_free_title_info(title);
             title = bd_get_playlist_info(bd, playlist, 0);
+            audioPlaylist = bd_read_mpls(CW2A(pendingPlaylist, CP_UTF8));
             menuBackground = IsBlurayMenuBackground(title);
             Log("playlist", playlist, title ? title->duration : 0);
             Log("menu_background", menuBackground, title ? title->chapter_count : 0);
             break;
         case BD_EVENT_PLAYLIST_STOP:
+            menuAudio.Reset();
             if (bdjActive) { playbackRequest = 1; readEnd = true; }
             break;
         case BD_EVENT_STILL:
@@ -572,9 +584,11 @@ bool CBlurayMenu::AttachRenderer(IUnknown* renderer)
 }
 void CBlurayMenu::DetachRenderer() { m->Detach(); }
 bool CBlurayMenu::RendererBusy() const { return m->presenting; }
-REFERENCE_TIME CBlurayMenu::Tick(REFERENCE_TIME position, bool running, double rate)
+REFERENCE_TIME CBlurayMenu::Tick(REFERENCE_TIME position, bool running, double rate, long volume)
 {
-    if (m->media.LossReason() || m->readFailed) return position;
+    if (m->media.LossReason() || m->readFailed) { m->menuAudio.Reset(); return position; }
+    const HRESULT audioResult = m->menuAudio.Tick(volume);
+    if (FAILED(audioResult)) StreamResult(true, -1, audioResult);
     if (m->title && !m->waitingGraph) {
         position = m->clock.Update(position, GetTickCount64(), running, rate,
             m->SegmentEnd());
@@ -597,6 +611,16 @@ REFERENCE_TIME CBlurayMenu::Tick(REFERENCE_TIME position, bool running, double r
     }
     m->Pump(position);
     return position;
+}
+bool CBlurayMenu::HoldsMenuStill() const {
+    return m->menuAudio.Active() && m->still && m->completed;
+}
+void CBlurayMenu::SetAudioState(OAFilterState state) {
+    const HRESULT hr = m->menuAudio.SetState(state);
+    if (FAILED(hr)) StreamResult(true, -1, hr);
+}
+OAFilterState CBlurayMenu::PlaybackState(OAFilterState mainState) const {
+    return m->menuAudio.Active() ? m->menuAudio.PlaybackState() : mainState;
 }
 REFERENCE_TIME CBlurayMenu::PlaybackPosition(REFERENCE_TIME reported) const { return m->clock.Position(reported); }
 void CBlurayMenu::PlayerSeek(REFERENCE_TIME position) {
@@ -700,9 +724,20 @@ bool CBlurayMenu::TakeStreams(int& audioPid, int& subtitlePid) {
     if (!m->streamsDirty || m->waitingGraph || !m->title || m->playitem >= m->title->clip_count) return false;
     m->streamsDirty = false;
     const auto& clip = m->title->clips[m->playitem];
-    if (m->audioStream && m->audioStream <= clip.audio_stream_count) {
-        const int pid = clip.audio_streams[m->audioStream - 1].pid;
-        if (pid != m->lastAudioPid) audioPid = m->lastAudioPid = pid;
+    BlurayMenuAudio separateAudio;
+    if (GetBlurayMenuAudio(m->audioPlaylist, m->playitem, m->audioStream, separateAudio)) {
+        const HRESULT hr = m->menuAudio.Select(m->root, separateAudio);
+        if (hr != S_FALSE) {
+            m->Log("menu_audio_subpath", separateAudio.subpath, separateAudio.pid);
+            StreamResult(true, separateAudio.pid, SUCCEEDED(hr) ? S_OK : hr);
+        }
+        m->lastAudioPid = -2; // The same PID in the main mux is a different stream.
+    } else {
+        m->menuAudio.Reset();
+        if (m->audioStream && m->audioStream <= clip.audio_stream_count) {
+            const int pid = clip.audio_streams[m->audioStream - 1].pid;
+            if (pid != m->lastAudioPid) audioPid = m->lastAudioPid = pid;
+        }
     }
     int pid = -1;
     if (m->pgEnabled && m->pgStream && m->pgStream <= clip.pg_stream_count)

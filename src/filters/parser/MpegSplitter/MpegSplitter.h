@@ -135,6 +135,7 @@ public:
 	STDMETHODIMP Count(DWORD* pcStreams);
 	STDMETHODIMP FindStream(WORD pid, DWORD* index, DWORD* group, DWORD* ordinal);
 	STDMETHODIMP SetPlayItemStop(UINT endExclusive);
+	STDMETHODIMP GetPresentationStart(REFERENCE_TIME* start);
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);
 	STDMETHODIMP Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk);
 

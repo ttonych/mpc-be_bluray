@@ -19,7 +19,10 @@ public:
     bool AttachRenderer(IUnknown* renderer);
     void DetachRenderer();
     bool RendererBusy() const;
-    REFERENCE_TIME Tick(REFERENCE_TIME position, bool running, double rate);
+    REFERENCE_TIME Tick(REFERENCE_TIME position, bool running, double rate, long volume);
+    void SetAudioState(OAFilterState state);
+    bool HoldsMenuStill() const;
+    OAFilterState PlaybackState(OAFilterState mainState) const;
     REFERENCE_TIME PlaybackPosition(REFERENCE_TIME reported) const;
     void PlayerSeek(REFERENCE_TIME position);
     bool CanSkip() const;

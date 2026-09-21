@@ -1,6 +1,6 @@
 param([string]$JavaHome = $env:JAVA_HOME)
 $ErrorActionPreference = 'Stop'
-foreach ($name in @('bdj-argb','disc-storage','media-monitor','menu-background','menu-color','menu-coordinates','menu-rle','playback-clock','portable-profile','release-version')) {
+foreach ($name in @('bdj-argb','disc-storage','media-monitor','menu-background','menu-audio','file-retry','menu-color','menu-coordinates','menu-rle','playback-clock','portable-profile','release-version')) {
     & (Join-Path $PSScriptRoot "test-$name.ps1")
 }
 foreach ($component in @('mouse-page','bdj-toggle')) {

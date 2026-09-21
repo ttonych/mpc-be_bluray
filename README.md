@@ -13,6 +13,10 @@ This is an independent, experimental fork. Its current base is the official
 **MPC-BE 1.9.1 release**, with **libbluray 1.5.0** and two maintained local patches.
 Fork version: **1.9.1-bluray.1**.
 
+This fork’s modifications were developed with the help of ChatGPT Astra.
+The project maintainer defines the functionality and interface requirements
+and tests the player with real Blu-ray discs.
+
 ## Download and quick start
 
 Download [1.9.1-bluray.1 — Windows x64 ZIP](https://github.com/ttonych/mpc-be_bluray/releases/download/1.9.1-bluray.1/mpc-be_bluray-1.9.1-bluray.1-x64.zip).

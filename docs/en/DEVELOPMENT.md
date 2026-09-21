@@ -141,9 +141,11 @@ first public release. Do not distribute the existing local candidate as a finish
 ## GitHub Actions
 
 - [Quick checks](../../.github/workflows/bluray-checks.yml) run on pull requests
-  or manually. They check publication inputs and the checker itself.
-  Automated RU/EN resource consistency and documentation checks are still pending;
-  these are currently reviewed locally.
+  or manually. They check publication inputs and the checker itself, authored
+  Markdown links/examples, and the fork's RU/EN resource IDs, format arguments
+  and dialog controls. Translation quality and visual layout still need review.
+  Run `python bluray/tools/check-docs-and-resources.py` for the same documentation
+  and resource checks locally.
 - [Full build](../../.github/workflows/bluray-build.yml) runs only when manually
   requested, on `windows-2022`. It builds native libbluray, Java components,
   component tests, MPC-BE and Russian resources, then uploads a ZIP and checksum.

@@ -33,8 +33,8 @@ and first published package are still pending.
   source/patch provenance and absence of personal data; create the public repository
   and establish the reviewed `main` branch. Require PRs and passing checks, block
   direct pushes/history rewriting, and do not require a second person's approval.
-- [ ] Extend quick PR checks with RU/EN resource consistency and documentation
-  validation; currently only publication inputs and the checker itself are automated.
+- [x] Add quick PR checks for documentation links/examples and RU/EN string IDs,
+  format arguments and dialog controls; verify their error detection locally.
 - [ ] Run the full GitHub Actions build with dependencies prepared on the hosted
   runner; inspect the ZIP contents and hashes.
 - [ ] Prepare a draft Release for the build commit, with its existing ZIP, checksum,

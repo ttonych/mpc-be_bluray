@@ -44,7 +44,7 @@ jobs:
             bluray/downloads
             bluray/tools/msys
             bluray/build/vcpkg_installed
-          key: bluray-windows2022-${{ hashFiles('bluray/vcpkg.json', 'bluray/versions.json', 'bluray/tools/prepare-dependencies.ps1') }}
+          key: bluray-windows2022-${{ hashFiles('bluray/vcpkg.json', 'bluray/vcpkg-configuration.json', 'bluray/ports/**', 'bluray/versions.json', 'bluray/tools/prepare-dependencies.ps1') }}
       - name: Prepare build dependencies
         run: ./bluray/tools/prepare-dependencies.ps1
       - name: Build libbluray

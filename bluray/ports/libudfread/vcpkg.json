@@ -1,0 +1,14 @@
+{
+  "name": "libudfread",
+  "version-semver": "1.2.0",
+  "port-version": 1,
+  "description": "UDF filesystem access library",
+  "homepage": "https://code.videolan.org/videolan/libudfread",
+  "license": "LGPL-2.1-or-later",
+  "dependencies": [
+    {
+      "name": "vcpkg-tool-meson",
+      "host": true
+    }
+  ]
+}

@@ -12,6 +12,11 @@ The `bluray` folder holds integration build tools, probes, local patches and
 [pinned versions](../../bluray/versions.json). Downloaded libbluray source and
 build dependencies are ignored, generated files. There is no separate libbluray
 fork repository at this stage.
+The `bluray/ports/libudfread` vcpkg overlay uses VideoLAN's official 1.2.0 release
+archive and its published SHA-512, because GitLab's generated archive can return
+an HTML bot challenge. It retains the pinned vcpkg port's MSVC patch; the library
+version is unchanged. The port's MIT notice is in `bluray/ports/LICENSE.txt`
+and is included in the player package as `licenses/vcpkg-port.txt`.
 Reconsider a separate library repository only if the maintained changes need
 to serve another player, such as a future MPC-HC integration.
 

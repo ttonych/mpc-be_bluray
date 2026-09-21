@@ -65,6 +65,7 @@ try {
     Copy-Item -LiteralPath (Join-Path $projectRoot 'patches') -Destination $outputRoot -Recurse -Force
     New-Item -ItemType Directory -Path $licenseRoot -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $sourceRoot 'COPYING') -Destination (Join-Path $licenseRoot 'libbluray.txt')
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'ports\LICENSE.txt') -Destination (Join-Path $licenseRoot 'vcpkg-port.txt')
     foreach ($package in @('libudfread', 'freetype', 'libxml2', 'brotli', 'bzip2', 'libpng', 'zlib', 'libiconv')) {
         Copy-Item -LiteralPath (Join-Path $DependencyRoot "share\$package\copyright") -Destination (Join-Path $licenseRoot "$package.txt")
     }

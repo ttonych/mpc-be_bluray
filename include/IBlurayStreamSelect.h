@@ -13,4 +13,6 @@ IBlurayStreamSelect : public IUnknown {
 interface __declspec(uuid("89E5DF56-9B39-4C91-8847-6ACB52DEBD75"))
 IBlurayPlaybackControl : public IUnknown {
     STDMETHOD(SetPlayItemStop)(UINT endExclusive) PURE;
+    // PTS origin used to normalize a standalone M2TS file's media positions.
+    STDMETHOD(GetPresentationStart)(REFERENCE_TIME* start) PURE;
 };

@@ -12,6 +12,9 @@ Base: official MPC-BE 1.9.1; libbluray 1.5.0 with local `mouse-page-v1` and
 
 - Added HDMV and BD-J menu navigation, adapted for use with the madVR video renderer.
 - Added menu/top-menu controls, disc track selection, chapter marks and OSD.
+- Added separately stored soundtracks for still menus, with volume and playback controls.
+- Fixed a crash when retrying a failed read from a standalone media file; persistent
+  read failures now return an error after one retry.
 - Corrected mouse coordinates with letterboxing and added a restricted HDMV
   submenu return path for compatible menu authoring patterns.
 - Added startup menu graphics and still-image handling; improved gallery timing,

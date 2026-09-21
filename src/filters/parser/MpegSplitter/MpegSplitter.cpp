@@ -1695,6 +1695,14 @@ STDMETHODIMP CMpegSplitterFilter::Count(DWORD* pcStreams)
 	return S_OK;
 }
 
+STDMETHODIMP CMpegSplitterFilter::GetPresentationStart(REFERENCE_TIME* start)
+{
+	CheckPointer(start, E_POINTER);
+	if (!m_pFile) return E_UNEXPECTED;
+	*start = m_pFile->m_rtMin;
+	return S_OK;
+}
+
 STDMETHODIMP CMpegSplitterFilter::SetPlayItemStop(UINT endExclusive)
 {
 	if (!endExclusive || endExclusive > m_Items.size()) return E_INVALIDARG;

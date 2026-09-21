@@ -136,10 +136,14 @@ UINT CMultiFiles::Read(BYTE* lpBuf, UINT nCount, DWORD& dwError)
 		LARGE_INTEGER llCurPos = {};
 		SetFilePointerEx(m_hFile, llNoMove, &llCurPos, FILE_CURRENT);
 
+		bool retried = false;
 again:
 		DWORD nNumberOfBytesRead = 0;
 		if (!ReadFile(m_hFile, lpBuf, nCount - dwRead, &nNumberOfBytesRead, nullptr)) {
-			if (Reopen(&dwError)) {
+			dwError = GetLastError();
+			// A persistent read failure must not spin forever on the UI/graph thread.
+			if (!retried && Reopen()) {
+				retried = true;
 				LARGE_INTEGER llNewPos = {};
 				if (SetFilePointerEx(m_hFile, llCurPos, &llNewPos, FILE_BEGIN) && llCurPos.QuadPart == llNewPos.QuadPart) {
 					goto again;
@@ -149,6 +153,7 @@ again:
 			break;
 		}
 
+		dwError = ERROR_SUCCESS;
 		dwRead   += nNumberOfBytesRead;
 		nCurPart = m_nCurPart;
 
@@ -169,6 +174,10 @@ void CMultiFiles::Close()
 
 BOOL CMultiFiles::OpenPart(size_t nPart)
 {
+	if (nPart >= m_strFiles.size()) {
+		SetLastError(ERROR_INVALID_PARAMETER);
+		return FALSE;
+	}
 	if (m_nCurPart == nPart) {
 		return TRUE;
 	} else {
@@ -179,7 +188,9 @@ BOOL CMultiFiles::OpenPart(size_t nPart)
 		if (m_hFile != INVALID_HANDLE_VALUE) {
 			m_nCurPart = nPart;
 			if (m_pCurrentPTSOffset) {
-				*m_pCurrentPTSOffset = m_rtPtsOffsets[nPart];
+				// Standalone M2TS files have no playlist offset table. A read-error
+				// retry can reopen them after the splitter has installed this pointer.
+				*m_pCurrentPTSOffset = nPart < m_rtPtsOffsets.size() ? m_rtPtsOffsets[nPart] : 0;
 			}
 		}
 

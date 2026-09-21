@@ -8234,15 +8234,18 @@ void CMainFrame::OnPlayPlay()
 
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (GetPlaybackMode() == PM_FILE) {
-			if (m_bEndOfStream) {
-				m_bEndOfStream = false;
-				SendMessageW(WM_COMMAND, ID_PLAY_STOP);
-				SendMessageW(WM_COMMAND, ID_PLAY_PLAYPAUSE);
+			// Resume the independent soundtrack without advancing an authored still.
+			if (!m_blurayMenu || !m_blurayMenu->HoldsMenuStill()) {
+				if (m_bEndOfStream) {
+					m_bEndOfStream = false;
+					SendMessageW(WM_COMMAND, ID_PLAY_STOP);
+					SendMessageW(WM_COMMAND, ID_PLAY_PLAYPAUSE);
+				}
+				if (m_bIsLiveOnline || FAILED(m_pMS->SetRate(m_PlaybackRate))) {
+					m_PlaybackRate = 1.0;
+				};
+				m_pMC->Run();
 			}
-			if (m_bIsLiveOnline || FAILED(m_pMS->SetRate(m_PlaybackRate))) {
-				m_PlaybackRate = 1.0;
-			};
-			m_pMC->Run();
 		} else if (GetPlaybackMode() == PM_DVD) {
 			if (m_PlaybackRate >= 0.0) {
 				m_pDVDC->PlayForwards(m_PlaybackRate, DVD_CMD_FLAG_Block, nullptr);
@@ -8272,6 +8275,7 @@ void CMainFrame::OnPlayPlay()
 			}
 		}
 
+		if (m_blurayMenu) m_blurayMenu->SetAudioState(State_Running);
 		SetTimersPlay();
 		if (m_bFrameSteppingActive) { // FIXME
 			m_bFrameSteppingActive = false;
@@ -8365,6 +8369,7 @@ void CMainFrame::OnPlayPlay()
 
 void CMainFrame::OnPlayPause()
 {
+	if (m_blurayMenu) m_blurayMenu->SetAudioState(State_Paused);
 	OAFilterState fs = GetMediaState();
 
 	if (m_eMediaLoadState == MLS_LOADED && fs == State_Stopped) {
@@ -8400,6 +8405,7 @@ void CMainFrame::OnPlayPause()
 void CMainFrame::OnPlayPlayPause()
 {
 	OAFilterState fs = GetMediaState();
+	if (m_blurayMenu) fs = m_blurayMenu->PlaybackState(fs);
 	if (fs == State_Running) {
 		SendMessageW(WM_COMMAND, ID_PLAY_PAUSE);
 	} else {
@@ -8409,11 +8415,14 @@ void CMainFrame::OnPlayPlayPause()
 
 void CMainFrame::OnPlayStop()
 {
+	if (m_blurayMenu) m_blurayMenu->SetAudioState(State_Stopped);
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (GetPlaybackMode() == PM_FILE) {
-			LONGLONG pos = 0;
-			m_pMS->SetPositions(&pos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
-			m_pMC->Stop();
+			if (!m_blurayMenu || !m_blurayMenu->HoldsMenuStill()) {
+				LONGLONG pos = 0;
+				m_pMS->SetPositions(&pos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
+				m_pMC->Stop();
+			}
 
 			// BUG: after pause or stop the netshow url source filter won't continue
 			// on the next play command, unless we cheat it by setting the file name again.
@@ -8500,6 +8509,7 @@ void CMainFrame::OnPlayStop()
 void CMainFrame::OnUpdatePlayPauseStop(CCmdUI* pCmdUI)
 {
 	OAFilterState fs = m_bFrameSteppingActive ? State_Paused : GetMediaState();
+	if (m_blurayMenu) fs = m_blurayMenu->PlaybackState(fs);
 
 	pCmdUI->SetCheck(fs == State_Running && pCmdUI->m_nID == ID_PLAY_PLAY
 					 || fs == State_Paused && pCmdUI->m_nID == ID_PLAY_PAUSE
@@ -19787,7 +19797,7 @@ void CMainFrame::TickBlurayMenu()
 	struct ResetTicking { bool& flag; ~ResetTicking() { flag = false; } } reset{m_blurayTicking};
 	REFERENCE_TIME position = 0;
 	if (m_pMS) m_pMS->GetCurrentPosition(&position);
-	position = m_blurayMenu->Tick(position, GetMediaState() == State_Running, m_PlaybackRate);
+	position = m_blurayMenu->Tick(position, GetMediaState() == State_Running, m_PlaybackRate, m_wndToolBar.Volume);
 	const CStringW discNotice = m_blurayMenu->DiscLossNotice();
 	if (!discNotice.IsEmpty()) {
 		KillTimer(TIMER_BLURAY_MENU);

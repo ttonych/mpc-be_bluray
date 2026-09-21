@@ -235,6 +235,8 @@
     <ClInclude Include="BlurayMenuColor.h" />
     <ClInclude Include="BlurayMenuRle.h" />
     <ClInclude Include="BlurayMenuBackground.h" />
+    <ClInclude Include="BlurayMenuAudio.h" />
+    <ClInclude Include="BlurayMenuAudioPlayer.h" />
     <ClInclude Include="CmdLineHelpDlg.h" />
     <ClInclude Include="ColorControl.h" />
     <ClInclude Include="ComPropertyPage.h" />

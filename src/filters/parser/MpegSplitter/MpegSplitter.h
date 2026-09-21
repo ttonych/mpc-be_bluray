@@ -27,7 +27,9 @@
 #include "MpegSplitterSettingsWnd.h"
 #include "DSUtil/AudioParser.h"
 #include <ITrackInfo.h>
+#include <IBlurayStreamSelect.h>
 #include <deque>
+#include <atomic>
 
 #define MpegSplitterName L"MPC MPEG Splitter"
 #define MpegSourceName   L"MPC MPEG Source"
@@ -36,6 +38,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	CMpegSplitterFilter
 	: public CBaseSplitterFilter
 	, public IAMStreamSelect
+	, public IBlurayStreamSelect
+	, public IBlurayPlaybackControl
 	, public ISpecifyPropertyPages2
 	, public IMpegSplitterFilter
 	, public CExFilterInfoImpl
@@ -81,6 +85,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	std::unique_ptr<CPacket> m_MasterDVStreamPacket;
 
 	std::vector<SyncPoint> m_sps;
+	std::atomic<LONGLONG> m_menuByteStop{MAXLONGLONG};
 
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 	void	ReadClipInfo(LPCOLESTR pszFileName);
@@ -128,6 +133,8 @@ public:
 	// IAMStreamSelect
 
 	STDMETHODIMP Count(DWORD* pcStreams);
+	STDMETHODIMP FindStream(WORD pid, DWORD* index, DWORD* group, DWORD* ordinal);
+	STDMETHODIMP SetPlayItemStop(UINT endExclusive);
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);
 	STDMETHODIMP Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk);
 

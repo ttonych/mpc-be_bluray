@@ -26,6 +26,7 @@
 #include "CryptoUtils.h"
 #include "Log.h"
 #include "Profile.h"
+#include <PortableTestConfig.h>
 #include "text.h"
 
 CStringW GetIniProgramDir()
@@ -55,7 +56,7 @@ CStringW GetIniUserProfile()
 CProfile::CProfile()
 {
 	CStringW path = GetIniProgramDir();
-	if (::PathFileExistsW(path)) {
+	if (MPCBE_PORTABLE_TEST || ::PathFileExistsW(path)) {
 		m_IniPath = path;
 		m_bIniProgDir = true;
 		return;
@@ -174,6 +175,9 @@ void CProfile::InitIni()
 
 bool CProfile::StoreSettingsTo(const SettingsLocation newLocation)
 {
+#if MPCBE_PORTABLE_TEST
+	return newLocation == SETS_PROGRAMDIR;
+#endif
 	if (newLocation == SETS_REGISTRY) {
 		if (m_hAppRegKey) {
 			DLog(L"StoreSettingsTo: The settings are already stored in the registry.");

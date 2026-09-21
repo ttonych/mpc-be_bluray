@@ -211,6 +211,42 @@ BEGIN
     CONTROL         "Paste URL from clipboard",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
 END
 
+IDD_PORTABLE_SETUP DIALOGEX 0, 0, 300, 202
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "First start MPC-BE"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "Choose settings for this copy of the player.", -1, 10, 10, 280, 10
+    GROUPBOX "Settings", -1, 10, 27, 280, 141
+    CONTROL "Windows &registry", IDC_PT_REGISTRY, "Button", BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP, 20, 40, 180, 10
+    CONTROL "INI file (&automatic search)", IDC_PT_AUTO_INI, "Button", BS_AUTORADIOBUTTON, 20, 76, 180, 10
+    CONTROL "Select an INI file &manually", IDC_PT_MANUAL_INI, "Button", BS_AUTORADIOBUTTON, 20, 112, 180, 10
+    CONTROL "Use &default settings", IDC_PT_DEFAULTS, "Button", BS_AUTORADIOBUTTON, 20, 150, 260, 10
+    RTEXT "", IDC_PT_REGISTRY_STATUS, 202, 40, 78, 10
+    LTEXT "HKCU\\Software\\MPC-BE", -1, 32, 54, 248, 10, SS_NOPREFIX
+    RTEXT "", IDC_PT_INI_STATUS, 202, 76, 78, 10
+    LTEXT "", IDC_PT_AUTO_PATH, 32, 90, 248, 14, SS_PATHELLIPSIS | SS_CENTERIMAGE | SS_NOPREFIX | SS_NOTIFY
+    LTEXT "", IDC_PT_MANUAL_PATH, 32, 128, 248, 14, SS_PATHELLIPSIS | SS_CENTERIMAGE | SS_NOPREFIX | SS_NOTIFY
+    PUSHBUTTON "&Browse...", IDC_PT_BROWSE, 202, 110, 78, 14, WS_GROUP
+    DEFPUSHBUTTON "OK", IDOK, 184, 180, 50, 14, WS_GROUP
+    PUSHBUTTON "Cancel", IDCANCEL, 240, 180, 50, 14
+END
+
+STRINGTABLE
+BEGIN
+    IDS_PT_FOUND "Found"
+    IDS_PT_NOT_FOUND "Not found"
+    IDS_PT_FILE_NOT_SELECTED "No file selected"
+    IDS_PT_SEARCH_FOLDER "Searched in: %s"
+    IDS_PT_INI_FILTER "MPC-BE settings (*.ini)|*.ini||"
+    IDS_PT_SELECT_FILE "Select an MPC-BE settings file"
+    IDS_PT_BAD_SOURCE "Select an INI settings file from another copy of MPC-BE."
+    IDS_PT_IMPORT_FAILED "Could not copy the settings. Close the source player and check access to its profile and the test folder. The source profile has not been changed."
+    IDS_PT_WRITE_FAILED "Cannot open the private profile for writing. Extract this test build to a writable folder. Shared MPC-BE settings will not be used."
+    IDS_PT_ASSOC_DISABLED "File associations and Explorer integration are disabled in this test build."
+    IDS_PT_STORAGE_LABEL "This copy's folder"
+END
+
 IDD_ABOUTBOX DIALOGEX 0, 0, 241, 202
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About"
@@ -301,6 +337,253 @@ BEGIN
     EDITTEXT        IDC_EDIT4,230,216,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN4,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,216,12,13
     LTEXT           "sec.",IDC_STATIC,263,218,26,8
+END
+
+IDD_PPAGEBLURAY DIALOGEX 0, 0, 296, 264
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL "Enable Blu-ray menus",IDC_BD_MENUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,5,286,12
+    CONTROL "",IDC_BD_TABS,"SysTabControl32",WS_TABSTOP,5,21,286,225
+    GROUPBOX "Region",IDC_STATIC,13,43,270,57
+    LTEXT "Region:",IDC_STATIC,20,59,36,10
+    COMBOBOX IDC_BD_REGION,60,56,38,65,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Country:",IDC_STATIC,107,59,37,10
+    COMBOBOX IDC_BD_COUNTRY,146,56,129,130,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "",IDC_BD_REGION_HINT,20,79,255,16
+    GROUPBOX "Preferred languages",IDC_STATIC,13,106,270,79
+    LTEXT "Menu:",IDC_STATIC,20,123,65,10
+    COMBOBOX IDC_BD_MENU_LANG,91,120,184,130,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Audio:",IDC_STATIC,20,144,65,10
+    COMBOBOX IDC_BD_AUDIO_LANG,91,141,184,130,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Subtitles:",IDC_STATIC,20,165,65,10
+    COMBOBOX IDC_BD_SUB_LANG,91,162,184,130,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Viewer age:",IDC_STATIC,20,199,89,10
+    COMBOBOX IDC_BD_AGE,113,196,162,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "2D / 3D preference:",IDC_STATIC,20,222,89,10
+    COMBOBOX IDC_BD_OUTPUT,113,219,162,90,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Changes take effect the next time a disc is opened.",IDC_BD_REOPEN_NOTE,5,251,286,12
+END
+
+STRINGTABLE
+BEGIN
+    IDS_BD_TOP_MENU "Blu-ray Top Menu"
+    IDS_BD_POPUP_MENU "Blu-ray Pop-up Menu"
+    IDS_BD_INVALID_BDJ_GRAPHICS "Invalid BD-J graphics update."
+    IDS_BD_UNSUPPORTED_OVERLAY_SIZE "Unsupported Blu-ray overlay dimensions."
+    IDS_BD_INVALID_OVERLAY_REGION "Invalid Blu-ray overlay region."
+    IDS_BD_INVALID_OVERLAY_RLE "Invalid Blu-ray overlay RLE."
+    IDS_BD_MENU_BITMAP_ALLOC_FAILED "Cannot allocate Blu-ray menu bitmap."
+    IDS_BD_MENU_BITMAP_REJECTED "madVR rejected the Blu-ray menu bitmap."
+    IDS_BD_NAVIGATION_FAILED "Blu-ray navigation failed (event %u, parameter %u)."
+    IDS_BD_FIRST_PLAY_FAILED "Blu-ray First Play failed."
+    IDS_BD_LIBRARY_MISSING "The local libbluray 1.5.0 DLL or one of its dependencies is missing."
+    IDS_BD_LIBRARY_INCOMPLETE "Incomplete libbluray DLL."
+    IDS_BD_LIBRARY_VERSION_REQUIRED "This prototype requires libbluray 1.5.0."
+    IDS_BD_OPEN_FAILED "Cannot open the Blu-ray disc."
+    IDS_BD_ADVANCED_SETTING_REJECTED "libbluray rejected an advanced player setting."
+    IDS_BD_JAVA_UNAVAILABLE "BD-J requires the local libbluray 1.5.0 JARs and a compatible x64 Java runtime."
+    IDS_BD_FIRST_PLAY_UNSUPPORTED "The disc has no supported Blu-ray First Play."
+    IDS_BD_STORAGE_CONFIG_ERROR "Cannot read the Blu-ray disc storage configuration."
+    IDS_BD_DISC_UNAVAILABLE "The Blu-ray disc is no longer available. Open the disc again."
+    IDS_BD_CANVAS_MISSING "The local BD-J graphics canvas is missing."
+    IDS_BD_RENDERER_UNSUPPORTED "The selected video renderer does not support Blu-ray menus in this build."
+    IDS_BD_SKIP_FORBIDDEN "The disc does not allow skipping at this point."
+    IDS_BD_PLAYLIST_SEGMENT_FAILED "Could not configure the Blu-ray playlist segment (0x%08X)."
+    IDS_BD_AUDIO_SELECTION_FAILED "Could not select the disc's audio track."
+    IDS_BD_SUBTITLE_SELECTION_FAILED "Could not select the disc's subtitle track."
+    IDS_BD_DISC_CHANGED "Disc removed or changed. Open Blu-ray again."
+    IDS_BD_DISC_READ_ERROR "Cannot read the Blu-ray disc. Open it again."
+    IDS_BD_POPUP_UNAVAILABLE "Pop-up menu is unavailable at this point. Use the Blu-ray top menu."
+    IDS_BD_TOP_MENU_FORBIDDEN "The disc does not allow the top menu at this point."
+    IDS_BD_START_FAILED "Could not start Blu-ray navigation."
+    IDS_BD_CHAPTER_OSD "Chapter %u/%u - %s"
+    IDS_BD_NO_DISC "Open a disc with Blu-ray menus"
+    IDS_BD_BAD_COUNTRY "Choose a country or enter its two-letter code, for example US, GB or RU."
+    IDS_BD_BAD_LANGUAGE "Choose a language or enter a three-letter ISO 639-2 code, for example eng or rus."
+    IDS_BD_STORAGE_ERROR "Could not open or prepare Blu-ray storage. Check access to the player folder."
+    IDS_BD_RESET_CONFIRM "Reset the saved position, languages and other data for ""%s""?\n\nThe reset will be saved when you click Apply or OK and take effect the next time this disc is opened."
+    IDS_BD_RESET_PENDING "Click Apply or OK to save the reset."
+    IDS_BD_RESET_SAVED "Disc data will be reset the next time this disc is opened."
+    IDD_PPAGEBLURAY "Playback::Blu-ray"
+END
+
+
+IDD_BD_ADVANCED DIALOGEX 0, 0, 274, 207
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "&Filter:",IDC_STATIC,4,7,35,10
+    EDITTEXT IDC_BD_FILTER,42,4,228,14,ES_AUTOHSCROLL
+    CONTROL "",IDC_BD_ADV_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,4,22,266,144
+    COMBOBOX IDC_BD_ADV_VALUE,135,25,135,110,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX IDC_BD_ADV_CHOICE,135,25,135,110,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT "",IDC_BD_ADV_DESCRIPTION,4,169,266,23
+    LTEXT "",IDC_BD_ADV_TECHNICAL,4,162,266,30
+    CONTROL "Technical &details",IDC_BD_ADV_DETAILS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,196,155,10
+    PUSHBUTTON "Reset selected",IDC_BD_ADV_DEFAULT,163,193,107,16
+END
+
+IDD_BD_JAVA DIALOGEX 0, 0, 274, 207
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX "Java for BD-J menus",IDC_STATIC,4,4,266,58
+    LTEXT "Java (x64):",IDC_STATIC,11,21,47,10
+    COMBOBOX IDC_BD_JAVA_HOME,61,18,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON "Browse...",IDC_BD_BROWSE_JAVA,214,17,49,16
+    LTEXT "",IDC_BD_JAVA_STATUS,11,38,252,20
+    GROUPBOX "Remembering settings and playback position",IDC_STATIC,4,69,266,63
+    CONTROL "Save disc settings and progress",IDC_BD_PERSISTENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,83,252,11
+    LTEXT "If supported by the disc menu.",IDC_STATIC,22,97,240,10
+    PUSHBUTTON "Disc list...",IDC_BD_DISCS,11,111,110,16
+    GROUPBOX "File locations",IDC_STATIC,4,139,266,70
+    LTEXT "Saves:",IDC_STATIC,11,155,48,10
+    COMBOBOX IDC_BD_PERSIST_ROOT,61,152,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON "Browse...",IDC_BD_BROWSE_PERSIST,214,151,49,16
+    LTEXT "Cache:",IDC_STATIC,11,177,48,10
+    COMBOBOX IDC_BD_CACHE_ROOT,61,174,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON "Browse...",IDC_BD_BROWSE_CACHE,214,173,49,16
+    LTEXT "Changing folders does not move existing files.",IDC_STATIC,11,194,252,10
+END
+
+IDD_BD_DISCS DIALOGEX 0, 0, 462, 275
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Blu-ray disc settings and progress"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "&Filter:",IDC_STATIC,7,10,37,10
+    EDITTEXT IDC_BD_FILTER,47,7,408,14,ES_AUTOHSCROLL
+    CONTROL "",IDC_BD_DISC_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | WS_BORDER | WS_TABSTOP,7,27,448,190
+    PUSHBUTTON "Rename",IDC_BD_DISC_RENAME,7,225,93,16
+    PUSHBUTTON "Open data folder",IDC_BD_DISC_OPEN,106,225,132,16
+    PUSHBUTTON "Reset data...",IDC_BD_RESET_DISC,244,225,119,16
+    PUSHBUTTON "Refresh",IDC_BD_DISC_REFRESH,369,225,86,16
+    LTEXT "",IDC_BD_DISC_COUNT,7,253,330,10
+    DEFPUSHBUTTON "Close",IDOK,383,251,72,16
+END
+
+STRINGTABLE
+BEGIN
+    IDS_BD_AUTO "Default"
+    IDS_BD_PARAMETER "Parameter"
+    IDS_BD_VALUE "Value"
+    IDS_BD_UNLIMITED "No age limit"
+    IDS_BD_OFF "Disabled"
+    IDS_BD_ON "Enabled"
+    IDS_BD_AUDIO_STEREO "Stereo"
+    IDS_BD_AUDIO_SURROUND "Multichannel"
+    IDS_BD_BAD_NUMBER "Choose a listed option or enter a number within the allowed range."
+    IDS_BD_BAD_PATH "Enter an absolute folder path without quotes, or leave it empty for the default."
+    IDS_BD_BAD_JAVA "This folder has no bin\\server\\jvm.dll (or jre\\bin\\server\\jvm.dll). Select a compatible 64-bit Java runtime."
+    IDS_BD_DISC_TITLE "Disc name"
+    IDS_BD_DISC_KIND "Type"
+    IDS_BD_DISC_LAST "Last opened"
+    IDS_BD_LEGACY "Shared legacy data"
+    IDS_BD_IDENTIFIED "Identified disc"
+    IDS_BD_LEGACY_NOTE "Shared legacy folder: may contain several discs. The title is a filename hint or a custom label."
+    IDS_BD_CATALOG_EMPTY "No saved discs yet. Entries appear for BD-J discs when saving is enabled."
+    44200 "Parental age"
+    44201 "Player profile"
+    44202 "Skipping and menu restrictions"
+    44203 "2D / 3D preference"
+    44204 "Audio capabilities"
+    44205 "Video capabilities"
+    44206 "Display capabilities / size"
+    44207 "3D capabilities"
+    44208 "UHD capabilities"
+    44209 "UHD display capabilities"
+    44210 "HDR preference"
+    44211 "SDR preference for disc menus"
+    44212 "Text subtitle capabilities"
+    44213 "libbluray subtitle decoder"
+    44220 "PSR13: 0–255; 255 means no age limit. MPC-BE defaults to 255."
+    44221 "PSR31: MPC-BE starts with profile 1.0. libbluray raises it to 5 (2.4) for 3D or 6 (3.1) for UHD. An explicit selection is applied after disc detection."
+    44222 "libbluray levels: 0 — unchecked; 5 — relaxed; 10 — exceptions; 20 — compliant. The default uses library level 5 plus MPC-BE checks on skipping and menu calls."
+    44223 "PSR21: 0 — 2D; 1 — 3D. Initial value is 0; 3D initialization sets 1. This does not enable stereoscopic output."
+    44224 "PSR15 defaults to 0xAAAA; 0x5555 means stereo. The mask describes LPCM, Dolby Digital/Plus/TrueHD and DTS-HD. Custom masks can be entered."
+    44225 "PSR29 defaults to 0x03. Bit 0x01: secondary HD video; bit 0x02: 25/50 Hz video."
+    44226 "PSR23 defaults to 0, or 0x0F for 3D. Bits 0–3 describe 3D modes; bits 8–19 hold screen width in cm (0 — unspecified)."
+    44227 "PSR24 defaults to 0; 3D initialization sets 0xFFFFFFFF. Public API 1.5.0 does not define individual bits."
+    44228 "PSR25 defaults to 0; UHD initialization sets 0xFFFFFFFF. Public API 1.5.0 does not define individual bits."
+    44229 "PSR26 defaults to 0; UHD initialization sets 0xFFFFFFFF. Public API 1.5.0 does not define individual bits."
+    44230 "PSR27 defaults to 0; UHD initialization sets 0xFFFFFFFF. This is information for menus, not a renderer HDR setting."
+    44231 "PSR28 defaults to 0 in libbluray 1.5.0, including UHD initialization. The public API provides no named choices."
+    44232 "PSR30 defaults to 0x1FFFF in libbluray 1.5.0. Custom masks can be entered if needed."
+    44233 "BLURAY_PLAYER_SETTING_DECODE_PG: 0 — disable PG/TextST decoders; 1 — enable. Default is 0."
+    44240 "1.0 — Initial Standard"
+    44241 "1.1 — BonusView / PiP"
+    44242 "2.0 — BD-Live"
+    44243 "3 — Audio only"
+    44244 "5 — 3D (2.4)"
+    44245 "6 — UHD (3.0)"
+    44246 "6 — UHD (3.1)"
+    44250 "Ignore all restrictions"
+    44251 "Relaxed checks"
+    44252 "Mostly follow disc restrictions"
+    44253 "Follow all disc restrictions"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_BD_GENERAL "General"
+    IDS_BD_COMPATIBILITY "Compatibility"
+    IDS_BD_JAVA_AUTO "Search runs when a disc is opened."
+    IDS_BD_JAVA_FOUND "Java files found. Compatibility is checked when opening a disc."
+    IDS_BD_JAVA_NOT_FOUND "Java files not found. Select the Java installation folder."
+    IDS_BD_FOLDER_LABEL "Folder: "
+    IDS_BD_FILES_LABEL "Files: "
+    IDS_BD_ID_LABEL "Disc ID: "
+    IDS_BD_SAVED_DISC_HINT "Settings and progress are managed by the disc menu. Details show the storage folder."
+    IDS_BD_NO_PREFERENCE "No preference"
+    IDS_BD_REGION_A_HINT "A: Americas, Japan and parts of Asia."
+    IDS_BD_REGION_B_HINT "B: Europe, Africa, Oceania and the Middle East."
+    IDS_BD_REGION_C_HINT "C: Russia, China and parts of Asia."
+    44350 "No age restriction"
+    44351 "Automatic, by disc type"
+    44352 "MPC-BE rules (default)"
+    44353 "By disc type"
+    44354 "Multichannel (default)"
+    44355 "Secondary HD + 25/50 Hz"
+    44356 "Automatic, by disc type"
+    44357 "Automatic, by disc type"
+    44358 "Automatic, by disc type"
+    44359 "Automatic, by disc type"
+    44360 "Automatic, by disc type"
+    44361 "Default value: 0"
+    44362 "Default value: 0x1FFFF"
+    44363 "Disabled (default)"
+    44370 "Age reported to disc menus. No limit is set by default. You may enter an age from 0 to 254."
+    44371 "Defaults: Blu-ray uses profile 1.0; 3D uses profile 5; UHD uses profile 6 (3.1). This does not add playback features."
+    44372 "By default MPC-BE checks disc restrictions on skipping and menu calls. Relaxing checks may disrupt the disc sequence."
+    44373 "Defaults: 2D is reported for ordinary discs, 3D for 3D discs. Display output is configured separately."
+    44374 "Disc menus are told that multichannel audio is supported. Configure speakers and bitstream output under Audio."
+    44375 "Disc menus are told that secondary HD video and 25/50 Hz are supported. This does not enable picture-in-picture playback."
+    44376 "Information for disc menus. Defaults advertise 3D for 3D discs; physical screen size is unspecified."
+    44377 "3D capabilities reported to menus are enabled when a 3D disc is detected. This does not change video output."
+    44378 "UHD capabilities reported to menus are enabled when a UHD disc is detected. Usually no change is needed."
+    44379 "UHD display information for menus is enabled when a UHD disc is detected. This does not configure the display."
+    44380 "HDR information for menus is set when a UHD disc is detected. Configure actual HDR output and tone mapping in the video renderer."
+    44381 "Menus receive the default value 0. This technical preference does not enable HDR-to-SDR conversion in the video renderer."
+    44382 "Menus receive the default text capability mask 0x1FFFF. MPC-BE subtitle appearance is configured separately."
+    44383 "Disabled by default: MPC-BE handles subtitles. Enabling a second decoder may produce duplicate subtitles."
+END
+
+
+STRINGTABLE
+BEGIN
+    IDS_BD_TAB_MENU "Disc menu"
+    IDS_BD_TAB_JAVA "Java and data"
+    IDS_BD_AUTO_SEARCH "Automatic search"
+    IDS_BD_PLAYER_FOLDER "In the player folder"
+    IDS_BD_DISC_COUNT "Discs: %d"
+    IDS_BD_DISC_FILTER_COUNT "Discs: %d of %d"
+    IDS_BD_SHARED_FOLDER "Shared folder used by multiple discs"
+    IDS_BD_RESET_DATA_CONFIRM "Reset settings and progress for ""%s""?\n\nThe disc will use empty data the next time it opens. Other discs are unaffected."
+    IDS_BD_RESET_DATA_DONE "Data reset. Reopen the disc to start with empty data."
 END
 
 IDD_PPAGEDVD DIALOGEX 0, 0, 296, 264

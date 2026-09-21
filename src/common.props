@@ -10,6 +10,11 @@
     <LinkIncremental Condition="$(Configuration.Contains('Debug'))">true</LinkIncremental>
     <LinkIncremental Condition="$(Configuration.Contains('Release'))">false</LinkIncremental>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(BlurayPortableTest)'=='true'">
+    <ClCompile>
+      <PreprocessorDefinitions>MPCBE_PORTABLE_TEST=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/Zo /Zc:throwingNew /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>

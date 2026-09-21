@@ -1,0 +1,5 @@
+#!/bin/sh
+# Inspect locally before any objects are sent to a remote.
+set -eu
+root=$(git rev-parse --show-toplevel)
+python "$root/bluray/tools/check-public-tree.py"

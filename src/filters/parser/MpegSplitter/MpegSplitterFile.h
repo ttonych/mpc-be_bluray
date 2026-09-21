@@ -101,6 +101,8 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	std::map<DWORD, SyncPoints> m_SyncPoints;
 
 	int m_tslen = 0; // transport stream packet length (188 or 192 bytes, auto-detected)
+	const CHdmvClipInfo::CPlaylist& m_Playlist;
+	REFERENCE_TIME PlaylistPTSOffset();
 
 public:
 	REFERENCE_TIME m_rtPTSOffset = 0;
@@ -232,7 +234,7 @@ public:
 
 	bool m_bIsBD;
 	CHdmvClipInfo &m_ClipInfo;
-	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin, bool bSupportMVCExtension);
+	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin, bool bSupportMVCExtension, const CHdmvClipInfo::CPlaylist& playlist);
 
 	BOOL CheckKeyFrame(std::vector<BYTE>& pData, const stream_codec codec);
 	REFERENCE_TIME NextPTS(const DWORD TrackNum, const stream_codec codec, __int64& nextPos, const BOOL bKeyFrameOnly = FALSE, const REFERENCE_TIME rtLimit = _I64_MAX);

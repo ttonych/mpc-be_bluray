@@ -1,0 +1,5 @@
+/.githooks/* text eol=lf
+/bluray/assets/*.mkv binary
+# Preserve the bytes used by patch manifests and the imported API headers.
+/bluray/patches/*.patch -text
+/include/libbluray/* -text

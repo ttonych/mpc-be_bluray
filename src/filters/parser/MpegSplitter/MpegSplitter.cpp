@@ -639,6 +639,8 @@ STDMETHODIMP CMpegSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void*
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
 		QI(IAMStreamSelect)
+		QI(IBlurayStreamSelect)
+		QI(IBlurayPlaybackControl)
 		QI(IExFilterInfo)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
@@ -1151,7 +1153,8 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		ReadClipInfo(GetPartFilename(pAsyncReader));
 	}
 
-	m_pFile.reset(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_bIsBD, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin, m_bSupportMVCExtension));
+	m_menuByteStop.store(MAXLONGLONG);
+	m_pFile.reset(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_bIsBD, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin, m_bSupportMVCExtension, m_Items));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
@@ -1627,6 +1630,10 @@ bool CMpegSplitterFilter::DemuxLoop()
 
 	HRESULT hr = S_OK;
 	while (SUCCEEDED(hr) && !CheckRequest(nullptr)) {
+		// A still can follow just two frames. Stop reading at the file boundary
+		// so later pictures cannot enter the decoder/renderer queues before the
+		// UI thread notices the pause. Flush the final PES below and deliver EOS.
+		if (m_pFile->GetPos() >= m_menuByteStop.load()) break;
 		hr = DemuxNextPacket(rtStartOffset);
 
 		if (FAILED(m_pFile->GetLastReadError())) {
@@ -1686,6 +1693,35 @@ STDMETHODIMP CMpegSplitterFilter::Count(DWORD* pcStreams)
 	}
 
 	return S_OK;
+}
+
+STDMETHODIMP CMpegSplitterFilter::SetPlayItemStop(UINT endExclusive)
+{
+	if (!endExclusive || endExclusive > m_Items.size()) return E_INVALIDARG;
+	auto item = m_Items.begin();
+	std::advance(item, endExclusive - 1);
+	m_menuByteStop.store(item->m_SizeOut);
+	return S_OK;
+}
+
+STDMETHODIMP CMpegSplitterFilter::FindStream(WORD pid, DWORD* index, DWORD* group, DWORD* ordinal)
+{
+	CheckPointer(index, E_POINTER);
+	CheckPointer(group, E_POINTER);
+	CheckPointer(ordinal, E_POINTER);
+	if (!m_pFile) return VFW_E_NOT_FOUND;
+	DWORD i = m_pFile->m_programs.GetValidCount() > 1 ? m_pFile->m_programs.GetValidCount() : 0;
+	for (int type = CMpegSplitterFile::video; type <= CMpegSplitterFile::subpic; ++type) {
+		DWORD n = 0;
+		for (const auto& stream : m_pFile->m_streams[type]) {
+			if (stream.pid == pid) {
+				*index = i; *group = type; *ordinal = n;
+				return S_OK;
+			}
+			++i; ++n;
+		}
+	}
+	return VFW_E_NOT_FOUND;
 }
 
 STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)

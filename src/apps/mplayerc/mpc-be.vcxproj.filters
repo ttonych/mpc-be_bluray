@@ -102,6 +102,12 @@
     <ClCompile Include="PPageColor.cpp">
       <Filter>Player Options</Filter>
     </ClCompile>
+    <ClCompile Include="PPageBluray.cpp">
+      <Filter>Player Options</Filter>
+    </ClCompile>
+    <ClCompile Include="BlurayDialogs.cpp">
+      <Filter>Player Options</Filter>
+    </ClCompile>
     <ClCompile Include="PPageDVD.cpp">
       <Filter>Player Options</Filter>
     </ClCompile>
@@ -570,6 +576,24 @@
       <Filter>Player Options</Filter>
     </ClInclude>
     <ClInclude Include="PPageColor.h">
+      <Filter>Player Options</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageBluray.h">
+      <Filter>Player Options</Filter>
+    </ClInclude>
+    <ClInclude Include="BluraySettings.h">
+      <Filter>Player Options</Filter>
+    </ClInclude>
+    <ClInclude Include="BlurayDialogs.h">
+      <Filter>Player Options</Filter>
+    </ClInclude>
+    <ClInclude Include="BlurayAdvancedSettings.h">
+      <Filter>Player Options</Filter>
+    </ClInclude>
+    <ClInclude Include="BlurayCatalog.h">
+      <Filter>Player Options</Filter>
+    </ClInclude>
+    <ClInclude Include="BlurayDiscStorage.h">
       <Filter>Player Options</Filter>
     </ClInclude>
     <ClInclude Include="PPageDVD.h">
@@ -1043,5 +1067,11 @@
     <CustomBuildStep Include="res\mplayerc.rc2">
       <Filter>Resource Files</Filter>
     </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PortableTest.cpp" />
+    <ClInclude Include="PortableTest.h" />
+    <ClInclude Include="PortableProfileImport.h" />
+    <ClInclude Include="..\..\..\include\PortableTestConfig.h" />
   </ItemGroup>
 </Project>

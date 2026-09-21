@@ -28,6 +28,7 @@
 #include "PPageLogo.h"
 #include "PPagePlayback.h"
 #include "PPageDVD.h"
+#include "PPageBluray.h"
 #include "PPageVideo.h"
 #include "PPageColor.h"
 #include "PPageYoutube.h"
@@ -84,6 +85,7 @@ private:
 	CPPageWebServer       m_webserver;
 	CPPagePlayback        m_playback;
 	CPPageDVD             m_dvd;
+	CPPageBluray          m_bluray;
 	CPPageCapture         m_tuner;
 	CPPageYoutube         m_youtube;
 	CPPageVideo           m_video;

@@ -1,0 +1,17 @@
+{
+  "mpc_be": {
+    "version": "1.9.1",
+    "commit": "d2c7b28a22ffe5ddd72632c9076d594ac6d2178f"
+  },
+  "bluray_revision": 1,
+  "libbluray": {
+    "version": "1.5.0",
+    "source_sha256": "f676408e91a5d321abf8b8d4dfdae36205c297dab5c54c3ec519639025f474a2",
+    "patches": [
+      "mouse-page-v1",
+      "bdj-toggle-v1"
+    ]
+  },
+  "msys_sha256": "ac66f98f21ebe8271871bc9f6d4f44f8e1efb9c35e26ded519469746b10b713c",
+  "java_build_major": 21
+}

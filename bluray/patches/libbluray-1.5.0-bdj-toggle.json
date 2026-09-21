@@ -1,0 +1,16 @@
+{
+  "upstream": "1.5.0",
+  "local_revision": "bdj-toggle-v1",
+  "source_sha256": "f676408e91a5d321abf8b8d4dfdae36205c297dab5c54c3ec519639025f474a2",
+  "files": {
+    "src/libbluray/bdj/java/org/havi/ui/HActionableHelper.java": {
+      "base": "9d13b17217a5d7e760dcdb06738521464a8848e9f8c6206605c97a9e322aa3cd",
+      "patched": "65347b093c32c83b580f661fea25a2a8d88588536a2241dbfe6727379b354a31"
+    },
+    "src/libbluray/bdj/java/org/havi/ui/HToggleButton.java": {
+      "base": "263d375895cb70bcd769ed7a0717606b30aaf3755075d7f8c3832118db41afc9",
+      "patched": "776f92f23184884a108e923accbbb43490f0e83267932f7237c857382213eb38"
+    }
+  },
+  "patch_sha256": "0ce3017bdfe183a701c9a765b8fe35061e507ee48deb11349293f063b0aeae43"
+}

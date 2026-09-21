@@ -1,0 +1,154 @@
+--- a/src/libbluray/bluray.c
++++ b/src/libbluray/bluray.c
+@@ -4038,6 +4038,24 @@
+     return result;
+ }
+ 
++int bd_mouse_select_page(BLURAY *bd, int64_t pts, uint16_t x, uint16_t y)
++{
++    int result = 0;
++    unsigned i;
++    bd_mutex_lock(&bd->mutex);
++    _set_scr(bd, pts);
++    /* Conservative: do not infer a navigation route across masked input. */
++    for (i = UO_MASK_MOVE_UP_SELECTED_BUTTON_MASK_INDEX; i <= UO_MASK_SELECT_AND_ACTIVATE_MASK_INDEX; ++i) {
++        if (_is_uo_masked(bd, (bd_uo_mask_index_e)i)) goto done;
++    }
++    if (bd->title_type == title_hdmv && bd->hdmv_suspended) {
++        result = _run_gc(bd, GC_CTRL_MOUSE_PAGE, ((uint32_t)x << 16) | y);
++    }
++done:
++    bd_mutex_unlock(&bd->mutex);
++    return result;
++}
++
+ static int _get_key_uo_index(BLURAY *bd, uint32_t key_id, bd_uo_mask_index_e *uo_index)
+ {
+     unsigned i;
+--- a/src/libbluray/bluray.h
++++ b/src/libbluray/bluray.h
+@@ -1185,6 +1185,15 @@
+  */
+ BD_PUBLIC int bd_mouse_select(BLURAY *bd, int64_t pts, uint16_t x, uint16_t y);
+ 
++/** MPC-BE local extension, not part of upstream libbluray 1.5.0.
++ * After a click misses all active buttons, try a single invisible HDMV
++ * page-return command whose destination has a button at (x,y).
++ * Returns 1 if the command was queued, 0 if no unambiguous route exists.
++ * Caller must run bd_read_ext with len=0, then call bd_mouse_select again
++ * before activating anything. Does not advance the media stream.
++ */
++BD_PUBLIC int bd_mouse_select_page(BLURAY *bd, int64_t pts, uint16_t x, uint16_t y);
++
+ 
+ /*
+  * Testing and debugging
+--- a/src/libbluray/decoders/graphics_controller.c
++++ b/src/libbluray/decoders/graphics_controller.c
+@@ -39,6 +39,8 @@
+ 
+ #include "../register.h"
+ #include "../keys.h"
++#include "../hdmv/mobj_data.h"
++#include "../hdmv/hdmv_insn.h"
+ 
+ #ifdef _WIN32
+ /* mingw: PRId64 seems to expands to %d without stdio.h ... */
+@@ -1785,6 +1787,77 @@
+     }
+ }
+ 
++/* Some discs retain main navigation in the video background, while a subpage
++ * only has an invisible auto-action return button. Follow a single authored
++ * page change on click only if its destination has a button under the pointer.
++ * Never execute arbitrary scripts speculatively or enable disabled buttons.
++ */
++static int _mouse_page(GRAPHICS_CONTROLLER *gc, unsigned x, unsigned y, GC_NAV_CMDS *cmds)
++{
++    PG_DISPLAY_SET *s = gc->igs;
++    BD_IG_PAGE *page = _find_page(&s->ics->interactive_composition,
++                                bd_psr_read(gc->regs, PSR_MENU_PAGE_ID));
++    BD_IG_BUTTON *route = NULL;
++    unsigned i, j;
++
++    if (!cmds || !page || !gc->ig_drawn || gc->button_effect_running ||
++        gc->in_effects || gc->out_effects) return 0;
++
++    for (i = 0; i < page->num_bogs; ++i) {
++        BD_IG_BUTTON *button = _find_button_bog(&page->bog[i], gc->bog_data[i].enabled_button);
++        const MOBJ_CMD *cmd;
++        BD_IG_PAGE *target;
++        BD_IG_BUTTON *initial;
++        unsigned initial_bog, linked = 0, hit = 0;
++
++        if (!button || !button->auto_action_flag || button->num_nav_cmds != 1 ||
++            button->normal_start_object_id_ref != 0xffff ||
++            button->selected_start_object_id_ref != 0xffff ||
++            button->activated_start_object_id_ref != 0xffff) continue;
++        cmd = button->nav_cmds;
++        if (!cmd || cmd->insn.grp != INSN_GROUP_SET || cmd->insn.sub_grp != SET_SETSYSTEM ||
++            cmd->insn.set_opt != INSN_SET_BUTTON_PAGE || cmd->insn.op_cnt != 2 ||
++            !cmd->insn.imm_op1 || !cmd->insn.imm_op2 ||
++            cmd->insn.branch_opt || cmd->insn.cmp_opt ||
++            !(cmd->src & 0x80000000) || !(cmd->dst & 0x80000000)) continue;
++        target = _find_page(&s->ics->interactive_composition, cmd->src & 0xff);
++        if (!target || target == page || target->in_effects.num_effects ||
++            page->out_effects.num_effects || target->uo_mask_table.select ||
++            target->uo_mask_table.activate) continue;
++        initial = _find_button_page(target, cmd->dst & 0xffff, &initial_bog);
++        if (!initial || initial->auto_action_flag) continue;
++
++        /* Require a link from an enabled, selectable button on this page. */
++        for (j = 0; j < page->num_bogs; ++j) {
++            BD_IG_BUTTON *from = _find_button_bog(&page->bog[j], gc->bog_data[j].enabled_button);
++            if (from && _find_object_for_button(s, from, BTN_SELECTED, NULL) &&
++                (from->upper_button_id_ref == button->id || from->lower_button_id_ref == button->id ||
++                 from->left_button_id_ref == button->id || from->right_button_id_ref == button->id)) linked = 1;
++        }
++        if (!linked) continue;
++
++        for (j = 0; j < target->num_bogs; ++j) {
++            unsigned id = j == initial_bog ? initial->id : target->bog[j].default_valid_button_id_ref;
++            BD_IG_BUTTON *to = _find_button_bog(&target->bog[j], id);
++            BD_PG_OBJECT *object = to ? _find_object_for_button(s, to, BTN_SELECTED, NULL) : NULL;
++            if (object && !to->auto_action_flag && x >= to->x_pos && y >= to->y_pos &&
++                x < (unsigned)to->x_pos + object->width && y < (unsigned)to->y_pos + object->height) hit = 1;
++        }
++        if (!hit) continue;
++        if (route) return 0; /* ambiguous routes require ordinary navigation */
++        route = button;
++    }
++    if (!route) return 0;
++
++    GC_TRACE("mouse page return via button #%u at %u,%u\n", route->id, x, y);
++    _select_button(gc, route->id);
++    cmds->num_nav_cmds = route->num_nav_cmds;
++    cmds->nav_cmds = route->nav_cmds;
++    gc->valid_mouse_position = 0;
++    _reset_user_timeout(gc);
++    return 1;
++}
++
+ static int _mouse_move(GRAPHICS_CONTROLLER *gc, uint16_t x, uint16_t y, GC_NAV_CMDS *cmds)
+ {
+     PG_DISPLAY_SET *s          = gc->igs;
+@@ -2059,6 +2132,9 @@
+ 
+         case GC_CTRL_MOUSE_MOVE:
+             result = _mouse_move(gc, param >> 16, param & 0xffff, cmds);
++            break;
++        case GC_CTRL_MOUSE_PAGE:
++            result = _mouse_page(gc, param >> 16, param & 0xffff, cmds);
+             break;
+ #ifndef __COVERITY__
+         /* no "default:" :
+--- a/src/libbluray/decoders/graphics_controller.h
++++ b/src/libbluray/decoders/graphics_controller.h
+@@ -51,6 +51,7 @@
+     /* user input */
+     GC_CTRL_VK_KEY,          /* param: bd_vk_key_e */
+     GC_CTRL_MOUSE_MOVE,      /* move selected button to (x,y), param: (x<<16 | y) */
++    GC_CTRL_MOUSE_PAGE,      /* opt-in click through an invisible page-return button */
+ 
+     /* HDMV VM control messages */
+     GC_CTRL_ENABLE_BUTTON,   /* param: button_id */

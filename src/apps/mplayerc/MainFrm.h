@@ -45,6 +45,7 @@
 
 #include "mplayerc.h"
 #include "HistoryFile.h"
+#include "BlurayMenu.h"
 
 #include "DSUtil/DSMPropertyBag.h"
 #include "DSUtil/FontInstaller.h"
@@ -197,6 +198,14 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	CComPtr<IAllocatorPresenter>	m_pCAP;
 	CLSID m_clsidCAP = GUID_NULL;
+	std::unique_ptr<CBlurayMenu> m_blurayMenu;
+	bool m_bluraySwitching = false;
+	bool m_blurayTicking = false;
+	bool m_blurayMouseDown = false;
+	bool m_blurayChaptersHidden = false;
+	void UpdateChapterMarkers(bool force = false);
+	void TickBlurayMenu();
+	HRESULT SetBlurayPlaybackPosition(REFERENCE_TIME position);
 
 	CComPtr<IMadVRSubclassReplacement> m_pMVRSR;
 	CComPtr<IMadVRSettings> m_pMVRS;
@@ -395,7 +404,8 @@ public:
 		TIMER_FLYBARWINDOWHIDER,
 		TIMER_DM_AUTOCHANGING,
 		TIMER_PAUSE,
-		TIMER_MOUSE_LEFT_LONGPRESS_SPEED
+		TIMER_MOUSE_LEFT_LONGPRESS_SPEED,
+		TIMER_BLURAY_MENU
 	};
 
 	void SetColorMenu();
@@ -685,6 +695,7 @@ public:
 	bool ResetDevice();
 	bool DisplayChange();
 	void CloseMedia(BOOL bNextIsOpened = FALSE);
+	void GetBlurayDiscStorage(CStringW& key, CStringW& name, CStringW& path) const;
 	void StartTunerScan(std::unique_ptr<TunerScanData>& pTSD);
 	void StopTunerScan();
 
@@ -858,6 +869,7 @@ public:
 	afx_msg LRESULT OnHotKey(WPARAM wParam, LPARAM lParam);
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg BOOL OnDeviceChange(UINT event, DWORD_PTR data);
 
 	afx_msg LRESULT OnGraphNotify(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnResizeDevice(WPARAM wParam, LPARAM lParam);

@@ -1,0 +1,7 @@
+# mouse PHASE X Y CLICK FLUSH_BEFORE_CLICK
+mouse scenes 550 930 1 0
+mouse bottom-setup 830 930 0 0
+flush after-hover
+mouse bottom-setup-again 830 930 1 1
+key down 13
+mouse bottom-setup-after-down 830 930 1 1

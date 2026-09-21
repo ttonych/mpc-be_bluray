@@ -90,6 +90,9 @@ private:
 	AVCodecContext*							m_pAVCtx   = nullptr;
 	AVCodecParserContext*					m_pParser  = nullptr;
 	AVFrame*								m_pFrame   = nullptr;
+	bool m_bEndOfSequence = false;
+	std::vector<BYTE> m_mpeg2StillPacket;
+	REFERENCE_TIME m_rtMpeg2Still = INVALID_TIME;
 	AVFrame*								m_pHWFrame = nullptr;
 	AVPacket*								m_pPacket = nullptr;
 	enum AVCodecID							m_CodecId;

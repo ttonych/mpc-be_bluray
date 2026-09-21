@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include "PortableTest.h"
 #include <thread>
 #include "AboutDlg.h"
 #include "CmdLineHelpDlg.h"
@@ -258,6 +259,9 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 
 bool CMPlayerCApp::ChangeSettingsLocation(const SettingsLocation newSetLocation)
 {
+#if MPCBE_PORTABLE_TEST
+	return newSetLocation == SETS_PROGRAMDIR;
+#endif
 	CString oldpath;
 	AfxGetMyApp()->GetAppSavePath(oldpath);
 	bool needFilesMove = (m_Profile.GetSettingsLocation() == SETS_PROGRAMDIR) != (newSetLocation == SETS_PROGRAMDIR);
@@ -827,8 +831,20 @@ BOOL CMPlayerCApp::InitInstance()
 	PreProcessCommandLine();
 	m_s.ParseCommandLine(m_cmdln);
 
+#if MPCBE_PORTABLE_TEST
+	if (m_s.nCLSwitches & (CLSW_REGEXTVID | CLSW_REGEXTAUD | CLSW_REGEXTPL | CLSW_UNREGEXT | CLSW_ADMINOPTION)) {
+		SetLanguage(GetDefLanguage(), false);
+		AfxMessageBox(IDS_PT_ASSOC_DISABLED, MB_ICONINFORMATION);
+		return FALSE;
+	}
+#endif
+
 	if (m_s.nCLSwitches & (CLSW_HELP | CLSW_UNRECOGNIZEDSWITCH)) { // show comandline help window
+#if MPCBE_PORTABLE_TEST
+		SetLanguage(GetDefLanguage(), false);
+#else
 		m_s.LoadSettings();
+#endif
 		ShowCmdlnSwitches();
 		return FALSE;
 	}
@@ -978,6 +994,11 @@ BOOL CMPlayerCApp::InitInstance()
 				}
 			}
 		}
+	}
+
+	// No fallback to the normal player's profile, including when our INI is absent.
+	if (!InitializePortableTest()) {
+		return FALSE;
 	}
 
 	// read settings

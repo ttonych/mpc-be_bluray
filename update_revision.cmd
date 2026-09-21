@@ -17,7 +17,7 @@ IF NOT EXIST %gitexe% GOTO :ÑHANGE_ÑHECK
 
 :GIT_OK
 
-FOR /F "delims=" %%A IN ('%gitexe% describe --long') DO (
+FOR /F "delims=" %%A IN ('%gitexe% describe --long --match "[0-9]*" --exclude "*-*"') DO (
   SET GIT_DESCRIBE_STR=%%A
 )
 

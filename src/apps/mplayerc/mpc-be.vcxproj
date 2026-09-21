@@ -91,6 +91,7 @@
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="AuthDlg.cpp" />
     <ClCompile Include="BaseGraph.cpp" />
+    <ClCompile Include="BlurayMenu.cpp" />
     <ClCompile Include="CmdLineHelpDlg.cpp" />
     <ClCompile Include="ColorControl.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
@@ -171,6 +172,9 @@
     <ClCompile Include="PPageBase.cpp" />
     <ClCompile Include="PPageCapture.cpp" />
     <ClCompile Include="PPageDVD.cpp" />
+    <ClCompile Include="PPageBluray.cpp" />
+    <ClCompile Include="BlurayDialogs.cpp" />
+    <ClCompile Include="PortableTest.cpp" />
     <ClCompile Include="PPageExternalFilters.cpp" />
     <ClCompile Include="PPageFileInfoClip.cpp" />
     <ClCompile Include="PPageFileInfoDetails.cpp" />
@@ -224,6 +228,13 @@
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="AuthDlg.h" />
     <ClInclude Include="BaseGraph.h" />
+    <ClInclude Include="BlurayMenu.h" />
+    <ClInclude Include="BlurayMenuCoordinates.h" />
+    <ClInclude Include="BlurayArgbBuffer.h" />
+    <ClInclude Include="BlurayMediaMonitor.h" />
+    <ClInclude Include="BlurayMenuColor.h" />
+    <ClInclude Include="BlurayMenuRle.h" />
+    <ClInclude Include="BlurayMenuBackground.h" />
     <ClInclude Include="CmdLineHelpDlg.h" />
     <ClInclude Include="ColorControl.h" />
     <ClInclude Include="ComPropertyPage.h" />
@@ -309,6 +320,15 @@
     <ClInclude Include="PPageBase.h" />
     <ClInclude Include="PPageCapture.h" />
     <ClInclude Include="PPageDVD.h" />
+    <ClInclude Include="PPageBluray.h" />
+    <ClInclude Include="BluraySettings.h" />
+    <ClInclude Include="PortableTest.h" />
+    <ClInclude Include="PortableProfileImport.h" />
+    <ClInclude Include="..\..\..\include\PortableTestConfig.h" />
+    <ClInclude Include="BlurayDialogs.h" />
+    <ClInclude Include="BlurayAdvancedSettings.h" />
+    <ClInclude Include="BlurayCatalog.h" />
+    <ClInclude Include="BlurayDiscStorage.h" />
     <ClInclude Include="PPageExternalFilters.h" />
     <ClInclude Include="PPageFileInfoClip.h" />
     <ClInclude Include="PPageFileInfoDetails.h" />

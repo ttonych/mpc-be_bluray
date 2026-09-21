@@ -1,0 +1,24 @@
+{
+  "upstream": "1.5.0",
+  "local_revision": "mouse-page-v1",
+  "source_sha256": "f676408e91a5d321abf8b8d4dfdae36205c297dab5c54c3ec519639025f474a2",
+  "files": {
+    "src/libbluray/bluray.c": {
+      "base": "c1b097b437f80ec7cfb62e77e9dcfe6510a1e19fdbe9cad36dfab1be15f09fa1",
+      "patched": "a9ccbd93749bc853c3abb7dda6aed0ef65a7491cba3b91afe21d8bf0550656c0"
+    },
+    "src/libbluray/bluray.h": {
+      "base": "a44aa6ff6849e106480f764e7cc456b037c85e621f49e01075e987fa2b8031fc",
+      "patched": "03893164ead4447e180f5faac1ad0a4b930cc4ab42ec80f5d44f6f109d6e0f83"
+    },
+    "src/libbluray/decoders/graphics_controller.c": {
+      "base": "bb8a4615ac8dfe5961ad7a50b64282bcbfd6ebab1d8039eca4e1ad802bf56b22",
+      "patched": "7d647e3870e7e2909e404ae7ba7a32ce4e5930ef4a6a6de1969ae85d38ae36c0"
+    },
+    "src/libbluray/decoders/graphics_controller.h": {
+      "base": "a16f9f02a7949d798aba2bc89d8a753f4fb7299db6957cb449d71e1b13f9bff8",
+      "patched": "887d809da7965ba62fbedca4593cc921fda16e4fc9cbf8260a2e09b56f0720b7"
+    }
+  },
+  "patch_sha256": "fce7b4cabbf4cbc41fdea78ca65b58bf8c8f5424f97f7b259ed88859ad79e2d5"
+}

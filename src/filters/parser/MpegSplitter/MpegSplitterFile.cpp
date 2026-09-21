@@ -30,8 +30,9 @@
 
 #include <libavutil/pixfmt.h>
 
-CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin, bool bSupportMVCExtension)
+CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin, bool bSupportMVCExtension, const CHdmvClipInfo::CPlaylist& playlist)
 	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_FILE_VAR | FM_STREAM)
+	, m_Playlist(playlist)
 	, m_type(MPEG_TYPES::mpeg_invalid)
 	, m_rate(0)
 	, m_bPESPTSPresent(TRUE)
@@ -2902,7 +2903,20 @@ bool CMpegSplitterFile::ReadPSS(pssyshdr& h)
 	return true;
 }
 
-#define PTS(pts) (llMulDiv(pts, 10000, 90, 0) + m_rtPTSOffset)
+REFERENCE_TIME CMpegSplitterFile::PlaylistPTSOffset()
+{
+	if (m_Playlist.empty()) return m_rtPTSOffset;
+	// The async reader can already be in the next M2TS while this parser is
+	// consuming the previous part from its 64 KiB cache. Use the logical packet
+	// position, not the reader's latest physical file, to translate timestamps.
+	const auto pos = GetPos();
+	auto item = std::upper_bound(m_Playlist.begin(), m_Playlist.end(), pos,
+		[](LONGLONG position, const CHdmvClipInfo::PlaylistItem& item) { return position < item.m_SizeIn; });
+	if (item != m_Playlist.begin()) --item;
+	return item->m_rtStartTime - item->m_rtIn + m_Playlist.front().m_rtIn;
+}
+
+#define PTS(pts) (llMulDiv(pts, 10000, 90, 0) + PlaylistPTSOffset())
 bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code, WORD pid)
 {
 	memset(&h, 0, sizeof(h));

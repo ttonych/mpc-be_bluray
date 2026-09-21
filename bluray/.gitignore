@@ -1,0 +1,9 @@
+/build/
+/out/
+/downloads/
+/vendor/
+/diagnostics/
+/tools/.venv/
+/tools/msys/
+/tools/apache-ant-*/
+__pycache__/

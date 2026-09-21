@@ -1043,4 +1043,5 @@ void CPlayerSeekBar::RemoveChapters()
 {
 	CAutoLock lock(&m_CBLock);
 	m_pChapterBag.Release();
+	m_strChap.Empty();
 }

@@ -94,6 +94,14 @@ public:
 
 	void Flush(bool bForce);
 	void Clear();
+	// Discard the read cache after a first-run import committed its own INI.
+	void ReloadIni() {
+		std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+		ASSERT(!m_hAppRegKey && !m_bIniNeedFlush);
+		m_ProfileMap.clear();
+		m_bIniFirstInit = false;
+		m_IniLastAccessTick = 0;
+	}
 
 	SettingsLocation GetSettingsLocation() const;
 

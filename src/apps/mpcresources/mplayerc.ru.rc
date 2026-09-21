@@ -212,6 +212,42 @@ BEGIN
     CONTROL         "Вставлять URL из буфера обмена",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
 END
 
+IDD_PORTABLE_SETUP DIALOGEX 0, 0, 300, 202
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Первый запуск MPC-BE"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "Выберите настройки для этой копии плеера.", -1, 10, 10, 280, 10
+    GROUPBOX "Настройки", -1, 10, 27, 280, 141
+    CONTROL "&Реестр Windows", IDC_PT_REGISTRY, "Button", BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP, 20, 40, 180, 10
+    CONTROL "INI-файл (&автопоиск)", IDC_PT_AUTO_INI, "Button", BS_AUTORADIOBUTTON, 20, 76, 180, 10
+    CONTROL "Выбрать INI-файл &вручную", IDC_PT_MANUAL_INI, "Button", BS_AUTORADIOBUTTON, 20, 112, 180, 10
+    CONTROL "Использовать с&тандартные настройки", IDC_PT_DEFAULTS, "Button", BS_AUTORADIOBUTTON, 20, 150, 260, 10
+    RTEXT "", IDC_PT_REGISTRY_STATUS, 202, 40, 78, 10
+    LTEXT "HKCU\\Software\\MPC-BE", -1, 32, 54, 248, 10, SS_NOPREFIX
+    RTEXT "", IDC_PT_INI_STATUS, 202, 76, 78, 10
+    LTEXT "", IDC_PT_AUTO_PATH, 32, 90, 248, 14, SS_PATHELLIPSIS | SS_CENTERIMAGE | SS_NOPREFIX | SS_NOTIFY
+    LTEXT "", IDC_PT_MANUAL_PATH, 32, 128, 248, 14, SS_PATHELLIPSIS | SS_CENTERIMAGE | SS_NOPREFIX | SS_NOTIFY
+    PUSHBUTTON "&Обзор…", IDC_PT_BROWSE, 202, 110, 78, 14, WS_GROUP
+    DEFPUSHBUTTON "ОК", IDOK, 184, 180, 50, 14, WS_GROUP
+    PUSHBUTTON "Отмена", IDCANCEL, 240, 180, 50, 14
+END
+
+STRINGTABLE
+BEGIN
+    IDS_PT_FOUND "Найдено"
+    IDS_PT_NOT_FOUND "Не найдено"
+    IDS_PT_FILE_NOT_SELECTED "Файл не выбран"
+    IDS_PT_SEARCH_FOLDER "Папка автопоиска: %s"
+    IDS_PT_INI_FILTER "Настройки MPC-BE (*.ini)|*.ini||"
+    IDS_PT_SELECT_FILE "Выберите файл настроек MPC-BE"
+    IDS_PT_BAD_SOURCE "Выберите INI-файл настроек другого MPC-BE."
+    IDS_PT_IMPORT_FAILED "Не удалось скопировать настройки. Закройте исходный плеер и проверьте доступ к его профилю и папке тестовой копии. Исходный профиль не изменён."
+    IDS_PT_WRITE_FAILED "Не удалось открыть отдельный профиль для записи. Распакуйте тестовую сборку в доступную для записи папку. Общие настройки MPC-BE не используются."
+    IDS_PT_ASSOC_DISABLED "В тестовой сборке изменение ассоциаций файлов и интеграции с Проводником отключено."
+    IDS_PT_STORAGE_LABEL "Папка этой копии"
+END
+
 IDD_ABOUTBOX DIALOGEX 0, 0, 241, 202
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "О программе"
@@ -302,6 +338,253 @@ BEGIN
     EDITTEXT        IDC_EDIT4,230,216,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN4,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,216,12,13
     LTEXT           "сек.",IDC_STATIC,263,218,26,8
+END
+
+IDD_PPAGEBLURAY DIALOGEX 0, 0, 296, 264
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL "Включить меню Blu-ray",IDC_BD_MENUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,5,286,12
+    CONTROL "",IDC_BD_TABS,"SysTabControl32",WS_TABSTOP,5,21,286,225
+    GROUPBOX "Регион",IDC_STATIC,13,43,270,57
+    LTEXT "Регион:",IDC_STATIC,20,59,36,10
+    COMBOBOX IDC_BD_REGION,60,56,38,65,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Страна:",IDC_STATIC,107,59,37,10
+    COMBOBOX IDC_BD_COUNTRY,146,56,129,130,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "",IDC_BD_REGION_HINT,20,79,255,16
+    GROUPBOX "Предпочитаемые языки",IDC_STATIC,13,106,270,79
+    LTEXT "Меню:",IDC_STATIC,20,123,65,10
+    COMBOBOX IDC_BD_MENU_LANG,91,120,184,130,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Звук:",IDC_STATIC,20,144,65,10
+    COMBOBOX IDC_BD_AUDIO_LANG,91,141,184,130,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Субтитры:",IDC_STATIC,20,165,65,10
+    COMBOBOX IDC_BD_SUB_LANG,91,162,184,130,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Возраст зрителя:",IDC_STATIC,20,199,89,10
+    COMBOBOX IDC_BD_AGE,113,196,162,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Предпочтение 2D / 3D:",IDC_STATIC,20,222,89,10
+    COMBOBOX IDC_BD_OUTPUT,113,219,162,90,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT "Изменения вступят в силу при следующем открытии диска.",IDC_BD_REOPEN_NOTE,5,251,286,12
+END
+
+STRINGTABLE
+BEGIN
+    IDS_BD_TOP_MENU "Главное меню Blu-ray"
+    IDS_BD_POPUP_MENU "Всплывающее меню Blu-ray"
+    IDS_BD_INVALID_BDJ_GRAPHICS "Некорректное обновление графики BD-J."
+    IDS_BD_UNSUPPORTED_OVERLAY_SIZE "Неподдерживаемые размеры графического слоя Blu-ray."
+    IDS_BD_INVALID_OVERLAY_REGION "Некорректная область графического слоя Blu-ray."
+    IDS_BD_INVALID_OVERLAY_RLE "Некорректные данные RLE графического слоя Blu-ray."
+    IDS_BD_MENU_BITMAP_ALLOC_FAILED "Не удалось выделить память для изображения меню Blu-ray."
+    IDS_BD_MENU_BITMAP_REJECTED "madVR не принял изображение меню Blu-ray."
+    IDS_BD_NAVIGATION_FAILED "Ошибка навигации Blu-ray (событие %u, параметр %u)."
+    IDS_BD_FIRST_PLAY_FAILED "Не удалось запустить начальный сценарий Blu-ray (First Play)."
+    IDS_BD_LIBRARY_MISSING "Не удалось загрузить DLL libbluray 1.5.0 из папки плеера или одну из её зависимостей."
+    IDS_BD_LIBRARY_INCOMPLETE "В DLL libbluray отсутствуют необходимые функции."
+    IDS_BD_LIBRARY_VERSION_REQUIRED "Для этой сборки нужна libbluray 1.5.0."
+    IDS_BD_OPEN_FAILED "Не удалось открыть диск Blu-ray."
+    IDS_BD_ADVANCED_SETTING_REJECTED "libbluray не приняла один из дополнительных параметров плеера."
+    IDS_BD_JAVA_UNAVAILABLE "Для BD-J нужны JAR-файлы libbluray 1.5.0 в папке плеера и совместимая 64-разрядная Java."
+    IDS_BD_FIRST_PLAY_UNSUPPORTED "Начальный сценарий Blu-ray (First Play) отсутствует или не поддерживается."
+    IDS_BD_STORAGE_CONFIG_ERROR "Не удалось прочитать настройки хранилища данных диска Blu-ray."
+    IDS_BD_DISC_UNAVAILABLE "Диск Blu-ray больше недоступен. Откройте диск заново."
+    IDS_BD_CANVAS_MISSING "В папке плеера отсутствует файл bdj-canvas.mkv для отображения графики BD-J."
+    IDS_BD_RENDERER_UNSUPPORTED "Выбранный видеорендерер не поддерживает меню Blu-ray в этой сборке."
+    IDS_BD_SKIP_FORBIDDEN "Диск не разрешает пропуск в этом месте."
+    IDS_BD_PLAYLIST_SEGMENT_FAILED "Не удалось подготовить фрагмент плейлиста Blu-ray (0x%08X)."
+    IDS_BD_AUDIO_SELECTION_FAILED "Не удалось выбрать звуковую дорожку диска."
+    IDS_BD_SUBTITLE_SELECTION_FAILED "Не удалось выбрать дорожку субтитров диска."
+    IDS_BD_DISC_CHANGED "Диск извлечён или заменён. Откройте Blu-ray заново."
+    IDS_BD_DISC_READ_ERROR "Не удалось прочитать диск Blu-ray. Откройте его заново."
+    IDS_BD_POPUP_UNAVAILABLE "Всплывающее меню сейчас недоступно. Откройте главное меню Blu-ray."
+    IDS_BD_TOP_MENU_FORBIDDEN "Диск не разрешает вызов главного меню в этом месте."
+    IDS_BD_START_FAILED "Не удалось запустить навигацию Blu-ray."
+    IDS_BD_CHAPTER_OSD "Глава %u/%u - %s"
+    IDS_BD_NO_DISC "Откройте диск с меню Blu-ray"
+    IDS_BD_BAD_COUNTRY "Выберите страну или введите двухбуквенный код, например RU, US или GB."
+    IDS_BD_BAD_LANGUAGE "Выберите язык или введите трёхбуквенный код ISO 639-2, например rus или eng."
+    IDS_BD_STORAGE_ERROR "Не удалось открыть или подготовить хранилище Blu-ray. Проверьте доступ к папке плеера."
+    IDS_BD_RESET_CONFIRM "Сбросить сохранённую позицию, языки и другие данные диска «%s»?\n\nСброс будет сохранён после нажатия «Применить» или «ОК» и вступит в силу при следующем открытии диска."
+    IDS_BD_RESET_PENDING "Нажмите «Применить» или «ОК», чтобы сохранить сброс."
+    IDS_BD_RESET_SAVED "Данные будут сброшены при следующем открытии диска."
+    IDD_PPAGEBLURAY "Воспроизведение::Blu-ray"
+END
+
+
+IDD_BD_ADVANCED DIALOGEX 0, 0, 274, 207
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "&Фильтр:",IDC_STATIC,4,7,35,10
+    EDITTEXT IDC_BD_FILTER,42,4,228,14,ES_AUTOHSCROLL
+    CONTROL "",IDC_BD_ADV_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,4,22,266,144
+    COMBOBOX IDC_BD_ADV_VALUE,135,25,135,110,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX IDC_BD_ADV_CHOICE,135,25,135,110,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT "",IDC_BD_ADV_DESCRIPTION,4,169,266,23
+    LTEXT "",IDC_BD_ADV_TECHNICAL,4,162,266,30
+    CONTROL "Технические &подробности",IDC_BD_ADV_DETAILS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,196,155,10
+    PUSHBUTTON "Сбросить выбранное",IDC_BD_ADV_DEFAULT,163,193,107,16
+END
+
+IDD_BD_JAVA DIALOGEX 0, 0, 274, 207
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX "Java для меню BD-J",IDC_STATIC,4,4,266,58
+    LTEXT "Java (x64):",IDC_STATIC,11,21,47,10
+    COMBOBOX IDC_BD_JAVA_HOME,61,18,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON "Обзор...",IDC_BD_BROWSE_JAVA,214,17,49,16
+    LTEXT "",IDC_BD_JAVA_STATUS,11,38,252,20
+    GROUPBOX "Запоминание настроек и места остановки",IDC_STATIC,4,69,266,63
+    CONTROL "Сохранять настройки и прогресс дисков",IDC_BD_PERSISTENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,83,252,11
+    LTEXT "Если это предусмотрено меню диска.",IDC_STATIC,22,97,240,10
+    PUSHBUTTON "Список дисков...",IDC_BD_DISCS,11,111,110,16
+    GROUPBOX "Расположение файлов",IDC_STATIC,4,139,266,70
+    LTEXT "Сохранения:",IDC_STATIC,11,155,48,10
+    COMBOBOX IDC_BD_PERSIST_ROOT,61,152,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON "Обзор...",IDC_BD_BROWSE_PERSIST,214,151,49,16
+    LTEXT "Кэш:",IDC_STATIC,11,177,48,10
+    COMBOBOX IDC_BD_CACHE_ROOT,61,174,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON "Обзор...",IDC_BD_BROWSE_CACHE,214,173,49,16
+    LTEXT "При смене папки файлы не переносятся.",IDC_STATIC,11,194,252,10
+END
+
+IDD_BD_DISCS DIALOGEX 0, 0, 462, 275
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Настройки и прогресс дисков Blu-ray"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "&Фильтр:",IDC_STATIC,7,10,37,10
+    EDITTEXT IDC_BD_FILTER,47,7,408,14,ES_AUTOHSCROLL
+    CONTROL "",IDC_BD_DISC_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | WS_BORDER | WS_TABSTOP,7,27,448,190
+    PUSHBUTTON "Переименовать",IDC_BD_DISC_RENAME,7,225,93,16
+    PUSHBUTTON "Открыть папку данных",IDC_BD_DISC_OPEN,106,225,132,16
+    PUSHBUTTON "Сбросить данные...",IDC_BD_RESET_DISC,244,225,119,16
+    PUSHBUTTON "Обновить",IDC_BD_DISC_REFRESH,369,225,86,16
+    LTEXT "",IDC_BD_DISC_COUNT,7,253,330,10
+    DEFPUSHBUTTON "Закрыть",IDOK,383,251,72,16
+END
+
+STRINGTABLE
+BEGIN
+    IDS_BD_AUTO "По умолчанию"
+    IDS_BD_PARAMETER "Параметр"
+    IDS_BD_VALUE "Значение"
+    IDS_BD_UNLIMITED "Без ограничения"
+    IDS_BD_OFF "Выключен"
+    IDS_BD_ON "Включён"
+    IDS_BD_AUDIO_STEREO "Стерео"
+    IDS_BD_AUDIO_SURROUND "Многоканальный звук"
+    IDS_BD_BAD_NUMBER "Выберите вариант из списка или введите число в допустимом диапазоне."
+    IDS_BD_BAD_PATH "Введите полный путь к папке без кавычек или оставьте поле пустым для значения по умолчанию."
+    IDS_BD_BAD_JAVA "В папке нет bin\\server\\jvm.dll (или jre\\bin\\server\\jvm.dll). Укажите совместимую 64-разрядную Java."
+    IDS_BD_DISC_TITLE "Название диска"
+    IDS_BD_DISC_KIND "Тип"
+    IDS_BD_DISC_LAST "Последнее открытие"
+    IDS_BD_LEGACY "Старые общие данные"
+    IDS_BD_IDENTIFIED "Диск определён"
+    IDS_BD_LEGACY_NOTE "Общая старая папка: может содержать несколько дисков. Название взято из имени файла или задано вручную."
+    IDS_BD_CATALOG_EMPTY "Сохранений пока нет. Записи появятся для дисков BD-J при включённом сохранении."
+    44200 "Возраст зрителя"
+    44201 "Профиль плеера"
+    44202 "Ограничения переходов и меню"
+    44203 "Предпочтение 2D / 3D"
+    44204 "Возможности аудио"
+    44205 "Возможности видео"
+    44206 "Возможности экрана"
+    44207 "Возможности 3D"
+    44208 "Возможности UHD"
+    44209 "Возможности UHD-экрана"
+    44210 "Предпочтение HDR"
+    44211 "Предпочтение SDR для меню"
+    44212 "Текстовые субтитры"
+    44213 "Декодер субтитров libbluray"
+    44220 "PSR13: 0–255; 255 означает отсутствие ограничения. Значение MPC-BE по умолчанию: 255."
+    44221 "PSR31: перед открытием MPC-BE задаёт профиль 1.0. libbluray повышает его до 5 (2.4) для 3D или 6 (3.1) для UHD. Явный выбор применяется после определения диска."
+    44222 "Уровни libbluray: 0 — без проверок; 5 — ослабленные; 10 — с исключениями; 20 — полные. В режиме по умолчанию библиотека использует 5, а MPC-BE дополнительно проверяет запреты переходов и меню."
+    44223 "PSR21: 0 — 2D; 1 — 3D. Начальное значение 0, инициализация 3D устанавливает 1. Этот выбор не включает стереоскопический вывод."
+    44224 "PSR15: по умолчанию 0xAAAA. 0x5555 — стерео. Маска описывает LPCM, Dolby Digital/Plus/TrueHD и DTS-HD. Вручную можно ввести другую маску."
+    44225 "PSR29: по умолчанию 0x03. Бит 0x01 — дополнительное HD-видео, 0x02 — видео 25/50 Гц."
+    44226 "PSR23: по умолчанию 0; для 3D — 0x0F. Биты 0–3 описывают 3D-режимы, биты 8–19 — ширину экрана в см (0 — не указана)."
+    44227 "PSR24: по умолчанию 0; при инициализации 3D — 0xFFFFFFFF. Публичный API 1.5.0 не расшифровывает отдельные биты."
+    44228 "PSR25: по умолчанию 0; при инициализации UHD — 0xFFFFFFFF. Публичный API 1.5.0 не расшифровывает отдельные биты."
+    44229 "PSR26: по умолчанию 0; при инициализации UHD — 0xFFFFFFFF. Публичный API 1.5.0 не расшифровывает отдельные биты."
+    44230 "PSR27: по умолчанию 0; при инициализации UHD — 0xFFFFFFFF. Это значение для меню, а не настройка HDR видеорендерера."
+    44231 "PSR28: стандартное значение libbluray 1.5.0 — 0, в том числе при инициализации UHD. Публичный API не определяет именованные варианты."
+    44232 "PSR30: стандартная маска libbluray 1.5.0 — 0x1FFFF. При необходимости можно ввести другую маску."
+    44233 "BLURAY_PLAYER_SETTING_DECODE_PG: 0 — выключить декодеры PG/TextST, 1 — включить. По умолчанию 0."
+    44240 "1.0 — базовый"
+    44241 "1.1 — BonusView / PiP"
+    44242 "2.0 — BD-Live"
+    44243 "3 — только аудио"
+    44244 "5 — 3D (2.4)"
+    44245 "6 — UHD (3.0)"
+    44246 "6 — UHD (3.1)"
+    44250 "Игнорировать все ограничения"
+    44251 "Ослабленные проверки"
+    44252 "Соблюдать с исключениями"
+    44253 "Соблюдать все ограничения"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_BD_GENERAL "Основные"
+    IDS_BD_COMPATIBILITY "Совместимость"
+    IDS_BD_JAVA_AUTO "Поиск выполняется при открытии диска."
+    IDS_BD_JAVA_FOUND "Файлы Java найдены. Совместимость проверяется при открытии диска."
+    IDS_BD_JAVA_NOT_FOUND "Файлы Java не найдены. Выберите папку установки Java."
+    IDS_BD_FOLDER_LABEL "Папка: "
+    IDS_BD_FILES_LABEL "Файлы: "
+    IDS_BD_ID_LABEL "Идентификатор: "
+    IDS_BD_SAVED_DISC_HINT "Настройками и прогрессом управляет меню диска. В подробностях указана папка сохранений."
+    IDS_BD_NO_PREFERENCE "Без предпочтения"
+    IDS_BD_REGION_A_HINT "A: Америка, Япония и часть Азии."
+    IDS_BD_REGION_B_HINT "B: Европа, Африка, Океания и Ближний Восток."
+    IDS_BD_REGION_C_HINT "C: Россия, Китай и часть Азии."
+    44350 "Без ограничения"
+    44351 "Автоматически по диску"
+    44352 "Правила MPC-BE (по умолчанию)"
+    44353 "По типу диска"
+    44354 "Многоканальный (стандарт)"
+    44355 "Доп. HD + 25/50 Гц"
+    44356 "Автоматически по диску"
+    44357 "Автоматически по диску"
+    44358 "Автоматически по диску"
+    44359 "Автоматически по диску"
+    44360 "Автоматически по диску"
+    44361 "Стандарт: 0"
+    44362 "Стандарт: 0x1FFFF"
+    44363 "Отключён (стандарт)"
+    44370 "Возраст, сообщаемый меню диска. По умолчанию ограничение не задаётся. Можно ввести возраст от 0 до 254."
+    44371 "По умолчанию: Blu-ray — профиль 1.0; 3D — профиль 5; UHD — профиль 6 (3.1). Возможности воспроизведения от этого не добавляются."
+    44372 "По умолчанию MPC-BE проверяет запреты переходов и вызова меню. Ослабление проверок может нарушить сценарий диска."
+    44373 "По умолчанию меню обычного диска получает предпочтение 2D, меню 3D-диска — 3D. Вывод на экран настраивается отдельно."
+    44374 "Меню диска получает сведения о многоканальном звуке. Настройки колонок и передачи звука находятся в разделе «Аудио»."
+    44375 "Меню получает сведения о поддержке дополнительного HD-видео и частот 25/50 Гц. Это не включает воспроизведение «картинка в картинке»."
+    44376 "Сведения для меню диска. По умолчанию возможности 3D заявляются для 3D-дисков, размер экрана не указан."
+    44377 "Возможности 3D для меню: включены при определении 3D-диска. Режим видеовывода этим параметром не меняется."
+    44378 "Возможности UHD для меню: включены при определении UHD-диска. Обычно менять этот параметр не требуется."
+    44379 "Сведения об UHD-экране для меню: включены при определении UHD-диска. Настройки экрана не меняются."
+    44380 "Сведения о HDR для меню: задаются при определении UHD-диска. Вывод HDR и преобразование яркости настраиваются в видеорендерере."
+    44381 "Меню получает стандартное значение 0. Это техническое предпочтение; оно не включает преобразование HDR в SDR в видеорендерере."
+    44382 "Меню получает стандартную маску поддержки текста 0x1FFFF. Оформление субтитров MPC-BE настраивается отдельно."
+    44383 "По умолчанию выключен: субтитры обрабатывает MPC-BE. Включение второго декодера может привести к дублированию субтитров."
+END
+
+
+STRINGTABLE
+BEGIN
+    IDS_BD_TAB_MENU "Меню диска"
+    IDS_BD_TAB_JAVA "Java и данные"
+    IDS_BD_AUTO_SEARCH "Автоматический поиск"
+    IDS_BD_PLAYER_FOLDER "В папке плеера"
+    IDS_BD_DISC_COUNT "Дисков: %d"
+    IDS_BD_DISC_FILTER_COUNT "Дисков: %d из %d"
+    IDS_BD_SHARED_FOLDER "Общая папка данных нескольких дисков"
+    IDS_BD_RESET_DATA_CONFIRM "Сбросить настройки и прогресс диска ""%s""?\n\nПри следующем открытии диск начнёт с чистых данных. Данные других дисков не изменятся."
+    IDS_BD_RESET_DATA_DONE "Данные сброшены. Откройте диск заново, чтобы начать с чистых данных."
 END
 
 IDD_PPAGEDVD DIALOGEX 0, 0, 296, 264

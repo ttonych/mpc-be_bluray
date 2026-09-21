@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "PPageSheet.h"
+#include <PortableTestConfig.h>
 #include <HighDPI.h>
 
 // CPPageSheet
@@ -44,7 +45,9 @@ CPPageSheet::CPPageSheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 	SetTreeWidth(nWidth);
 
 	AddPage(&m_player);
+#if !MPCBE_PORTABLE_TEST
 	AddPage(&m_formats);
+#endif
 	AddPage(&m_acceltbl);
 	AddPage(&m_mouse);
 	AddPage(&m_logo);
@@ -54,6 +57,7 @@ CPPageSheet::CPPageSheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 	AddPage(&m_webserver);
 	AddPage(&m_playback);
 	AddPage(&m_dvd);
+	AddPage(&m_bluray);
 	AddPage(&m_tuner);
 	AddPage(&m_youtube);
 	AddPage(&m_video);

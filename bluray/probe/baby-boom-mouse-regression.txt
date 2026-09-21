@@ -1,0 +1,14 @@
+# Direct clicks on active controls take priority; empty areas do nothing.
+pageclick main-blank 1000 200 1 0
+pageclick scenes 550 930 1 0
+pageclick scene-blank 850 850 1 0
+pageclick scene-next 1660 560 1 0
+pageclick scene-previous 235 560 1 0
+# Bottom items are only on the parent page: return, re-hit-test, activate.
+pageclick scenes-to-setup 830 930 1 0
+pageclick setup-blank 1400 850 1 0
+pageclick setup-to-scenes 550 930 1 0
+pageclick scenes-to-special 1100 930 1 0
+pageclick special-to-scenes 550 930 1 0
+pageclick scenes-to-film 250 930 1 0
+flush final

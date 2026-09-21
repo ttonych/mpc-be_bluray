@@ -20,7 +20,12 @@
 
 #pragma once
 
+#include "PortableTestConfig.h"
+#if MPCBE_PORTABLE_TEST
+#define MPC_WND_CLASS_NAMEW L"MPC-BE-BluRay-PortableTest"
+#else
 #define MPC_WND_CLASS_NAMEW L"MPC-BE"
+#endif
 
 #define KILOBYTE          1024
 #define MEGABYTE       1048576

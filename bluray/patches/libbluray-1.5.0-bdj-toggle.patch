@@ -1,0 +1,62 @@
+--- a/src/libbluray/bdj/java/org/havi/ui/HActionableHelper.java
++++ b/src/libbluray/bdj/java/org/havi/ui/HActionableHelper.java
+@@ -97,9 +97,13 @@
+      * @return The current interaction state (unchanged by action events)
+      */
+     public void processHActionEvent(HActionEvent evt) {
+-        // Play action sound
+-        if (actionSound != null) {
+-            actionSound.play();
++        // Toggle buttons have a separate sound for the unset state.
++        HSound sound = actionSound;
++        if (hVisible instanceof HToggleButton && !((HToggleButton)hVisible).getSwitchableState()) {
++            sound = ((HToggleButton)hVisible).getUnsetActionSound();
++        }
++        if (sound != null) {
++            sound.play();
+         }
+ 
+         // Notify action listeners
+@@ -129,7 +133,9 @@
+         // Fire action event (cast is safe - this helper is only used by HActionable components)
+         HActionEvent actionEvent = new HActionEvent(
+             (HActionInputPreferred) hVisible, HActionEvent.ACTION_PERFORMED, actionCommand);
+-        processHActionEvent(actionEvent);
++        // Dispatch through the component so toggle buttons and Xlet subclasses
++        // can update their state before notifying the action listeners.
++        ((HActionInputPreferred)hVisible).processHActionEvent(actionEvent);
+ 
+         return true;
+     }
+--- a/src/libbluray/bdj/java/org/havi/ui/HToggleButton.java
++++ b/src/libbluray/bdj/java/org/havi/ui/HToggleButton.java
+@@ -20,6 +20,7 @@
+ package org.havi.ui;
+ 
+ import java.awt.Image;
++import org.havi.ui.event.HActionEvent;
+ 
+ import org.videolan.BDJXletContext;
+ 
+@@ -135,6 +136,21 @@
+         return (getInteractionState() & ACTIONED_STATE_BIT) != 0;
+     }
+ 
++    public void processHActionEvent(HActionEvent event) {
++        if (event.getID() != HActionEvent.ACTION_PERFORMED ||
++            (getInteractionState() & DISABLED_STATE_BIT) != 0) {
++            return;
++        }
++        if (toggleGroup == null) {
++            setSwitchableState(!getSwitchableState());
++        } else if (getSwitchableState()) {
++            toggleGroup.setCurrent(null);
++        } else {
++            toggleGroup.setCurrent(this);
++        }
++        super.processHActionEvent(event);
++    }
++
+     public void setSwitchableState(boolean state) {
+         int old = getInteractionState();
+         setInteractionState(state ? (old | ACTIONED_STATE_BIT) : (old & ~ACTIONED_STATE_BIT));

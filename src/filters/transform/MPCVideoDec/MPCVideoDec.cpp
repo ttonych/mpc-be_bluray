@@ -66,6 +66,7 @@ extern "C" {
 
 #include "Version.h"
 
+
 // option names
 #define OPT_REGKEY_VideoDec  L"Software\\MPC-BE Filters\\MPC Video Decoder"
 #define OPT_SECTION_VideoDec L"Filters\\MPC Video Decoder"
@@ -1349,6 +1350,11 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 	CComPtr<IMediaSideData> pMediaSideData;
 	if (SUCCEEDED(pSample->QueryInterface(&pMediaSideData))) {
 		HRESULT hr = E_FAIL;
+		if (m_bEndOfSequence) {
+			const DWORD flags = MediaSideDataControlFlags_EndOfSequence;
+			pMediaSideData->SetSideData(IID_MediaSideDataControlFlags,
+				reinterpret_cast<const BYTE*>(&flags), sizeof(flags));
+		}
 		if (auto sd = av_frame_get_side_data(pFrame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA)) {
 			if (sd->size == sizeof(AVMasteringDisplayMetadata)) {
 				auto metadata = reinterpret_cast<AVMasteringDisplayMetadata*>(sd->data);
@@ -1828,6 +1834,8 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 
 void CMPCVideoDecFilter::Cleanup()
 {
+	m_mpeg2StillPacket.clear();
+	m_rtMpeg2Still = INVALID_TIME;
 	CAutoLock cAutoLock(&m_csReceive);
 
 	CleanupFFmpeg();
@@ -3284,6 +3292,8 @@ HRESULT CMPCVideoDecFilter::BeginFlush()
 HRESULT CMPCVideoDecFilter::EndFlush()
 {
 	CAutoLock cAutoLock(&m_csReceive);
+	m_mpeg2StillPacket.clear();
+	m_rtMpeg2Still = INVALID_TIME;
 	HRESULT hr =  __super::EndFlush();
 
 	if (m_pAVCtx && avcodec_is_open(m_pAVCtx)) {
@@ -3317,6 +3327,8 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	m_bWaitingForKeyFrame = TRUE;
 
 	m_rtStartCache = INVALID_TIME;
+	m_mpeg2StillPacket.clear();
+	m_rtMpeg2Still = INVALID_TIME;
 
 	m_rtLastStart = INVALID_TIME;
 	m_rtLastStop = 0;
@@ -3635,6 +3647,10 @@ HRESULT CMPCVideoDecFilter::FillAVPacket(const BYTE* buffer, int buflen)
 
 HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll/* = FALSE*/)
 {
+	const BYTE sequenceEnd[] = {0, 0, 1, 0xb7};
+	const bool endsSequence = m_CodecId == AV_CODEC_ID_MPEG2VIDEO && avpkt && avpkt->size >= 4
+		&& !memcmp(avpkt->data + avpkt->size - 4, sequenceEnd, sizeof(sequenceEnd));
+	m_bEndOfSequence = false;
 	if (avpkt) {
 		if (m_bWaitingForKeyFrame) {
 			if (m_CodecId == AV_CODEC_ID_MPEG2VIDEO) {
@@ -3744,6 +3760,10 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				m_FormatConverter.SetDirect(TRUE);
 			}
 		}
+
+		// Tell renderers such as madVR to present the final picture without
+		// waiting for more frames to fill their processing queues.
+		m_bEndOfSequence = endsSequence && (avpkt->size == 4 || !m_pAVCtx->has_b_frames);
 
 		UpdateAspectRatio();
 
@@ -4045,6 +4065,40 @@ HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERE
 		}
 
 		if (pOutLen > 0) {
+			const BYTE sequenceEnd[] = {0, 0, 1, 0xb7};
+			if (m_CodecId == AV_CODEC_ID_MPEG2VIDEO && !m_mpeg2StillPacket.empty()) {
+				const REFERENCE_TIME step = REFERENCE_TIME(GetFrameDuration() / m_dRate);
+				// A Blu-ray still may contain just two standalone I-pictures many
+				// seconds apart. Renderers with look-ahead (including madVR smooth
+				// motion) need samples throughout that interval. Repeat the exact
+				// compressed picture at its nominal cadence, without re-encoding.
+				// Bound damaged timestamp gaps; normal video never enters this path.
+				if (step > 0 && m_rtMpeg2Still >= 0 && rtStart > m_rtMpeg2Still
+						&& (rtStart - m_rtMpeg2Still) / 2 >= step
+						&& rtStart - m_rtMpeg2Still <= 60 * UNITS) {
+					for (REFERENCE_TIME time = m_rtMpeg2Still + step; time < rtStart - step / 2; time += step) {
+						if (m_pInput->IsFlushing()) return S_FALSE;
+						hr = FillAVPacket(m_mpeg2StillPacket.data(), int(m_mpeg2StillPacket.size()));
+						if (FAILED(hr)) return hr;
+						m_pPacket->pts = time;
+						hr = DecodeInternal(m_pPacket, time, time + step);
+						if (hr != S_OK) return hr;
+						hr = FillAVPacket(sequenceEnd, sizeof(sequenceEnd));
+						if (FAILED(hr)) return hr;
+						m_pPacket->pts = AV_NOPTS_VALUE;
+						hr = DecodeInternal(m_pPacket, INVALID_TIME, INVALID_TIME);
+						if (hr != S_OK) return hr;
+					}
+				}
+			}
+			m_mpeg2StillPacket.clear();
+			m_rtMpeg2Still = INVALID_TIME;
+			if (m_CodecId == AV_CODEC_ID_MPEG2VIDEO && m_pParser->pict_type == AV_PICTURE_TYPE_I
+					&& pOutLen > 4 && rtStart >= 0 && !bPreroll
+					&& !memcmp(pOutBuffer + pOutLen - 4, sequenceEnd, sizeof(sequenceEnd))) {
+				m_mpeg2StillPacket.assign(pOutBuffer, pOutBuffer + pOutLen);
+				m_rtMpeg2Still = rtStart;
+			}
 			if (FAILED(hr = FillAVPacket(pOutBuffer, pOutLen))) {
 				break;
 			}
@@ -4052,6 +4106,17 @@ HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERE
 			m_pPacket->pts = rtStart;
 
 			hr = DecodeInternal(m_pPacket, rtStartIn, rtStopIn, bPreroll);
+			if (SUCCEEDED(hr) && m_CodecId == AV_CODEC_ID_MPEG2VIDEO && pOutLen > 4
+					&& !memcmp(pOutBuffer + pOutLen - 4, sequenceEnd, sizeof(sequenceEnd))) {
+				// MPEG-2 can end a sequence with a single still picture. Submit
+				// the end marker separately to release its delayed reference frame
+				// now, without putting avcodec into end-of-stream draining mode.
+				hr = FillAVPacket(sequenceEnd, sizeof(sequenceEnd));
+				if (SUCCEEDED(hr)) {
+					m_pPacket->pts = AV_NOPTS_VALUE;
+					hr = DecodeInternal(m_pPacket, INVALID_TIME, INVALID_TIME, bPreroll);
+				}
+			}
 
 			if (FAILED(hr)) {
 				break;

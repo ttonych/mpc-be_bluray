@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <PortableTestConfig.h>
 #include "MainFrm.h"
 #include "PPagePlayer.h"
 #include "DSUtil/Filehandle.h"
@@ -133,6 +134,12 @@ BOOL CPPagePlayer::OnInitDialog()
 	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.bKeepHistory);
 	m_spnRecentFiles.EnableWindow(s.bKeepHistory);
 
+#if MPCBE_PORTABLE_TEST
+	GetDlgItem(IDC_RADIO4)->EnableWindow(FALSE);
+	GetDlgItem(IDC_RADIO5)->EnableWindow(FALSE);
+	SetDlgItemTextW(IDC_RADIO6, ResStr(IDS_PT_STORAGE_LABEL));
+#endif
+
 	if (m_iSetsLocation != SETS_REGISTRY && ::PathFileExistsW(profile.GetIniPath())) {
 		HANDLE hDir = CreateFileW(profile.GetIniPath(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
 			OPEN_EXISTING, 0, nullptr);
@@ -168,7 +175,7 @@ BOOL CPPagePlayer::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 	auto pFrame = AfxGetMainFrame();
 
-	if (s.iMultipleInst != m_iMultipleInst && CPPageFormats::ShellExtExists()) {
+	if (!MPCBE_PORTABLE_TEST && s.iMultipleInst != m_iMultipleInst && CPPageFormats::ShellExtExists()) {
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, shellExtKeyName)) {
 			key.SetDWORDValue(IDS_RS_MULTIINST, m_iMultipleInst);
@@ -242,7 +249,7 @@ BOOL CPPagePlayer::OnApply()
 
 	// Check if the settings location needs to be changed
 	CProfile& profile = AfxGetProfile();
-	if (m_iSetsLocation != m_iCurSetsLocation) {
+	if (!MPCBE_PORTABLE_TEST && m_iSetsLocation != m_iCurSetsLocation) {
 		pFrame->m_wndPlaylistBar.TDeleteAllPlaylists();
 		AfxGetMyApp()->ChangeSettingsLocation((SettingsLocation)m_iSetsLocation);
 		pFrame->m_wndPlaylistBar.TSaveAllPlaylists();

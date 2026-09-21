@@ -73,6 +73,16 @@ published Release. The tester confirmed menus, film start and menu recall on
 A Knight’s Tale and Baby Boom, plus separate music, pause/resume and film start
 on Grand Prix. The tested ZIP was published without rebuilding.
 
+## Changes awaiting the next release
+
+- Fixed Blu-ray ISO images being unmounted between playlists. Local checks with
+  Baby Boom and madVR covered the introductory clips, menu, film start, return to
+  the menu, the Open ISO dialog, and releasing the image on disc/player close.
+  The tester also confirmed both introductory clips, the menu and film start
+  after dragging the ISO onto the corrected player.
+  The published 1.9.1-bluray.1 ZIP does not contain this fix; a new cloud candidate
+  still needs to be built and checked before another release.
+
 ## After initial feedback
 
 - Prioritize reproducible menu, playback, data-isolation and crash regressions.

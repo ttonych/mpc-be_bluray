@@ -4924,7 +4924,9 @@ void CMainFrame::OnFilePostCloseMedia()
 
 	SetAudioPicture(FALSE);
 
-	if (m_bNeedUnmountImage) {
+	// Blu-ray playlist changes rebuild the graph within the same disc session.
+	// Keep its ISO mounted until the disc is actually closed.
+	if (m_bNeedUnmountImage && !m_bluraySwitching) {
 		m_DiskImage.UnmountDiskImage();
 	}
 	m_bNeedUnmountImage = TRUE;

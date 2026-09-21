@@ -5,6 +5,12 @@
 This file covers this fork. The original MPC-BE history remains in
 [Changelog.txt](../Changelog.txt).
 
+## Unreleased
+
+- Fixed premature unmounting of Blu-ray ISO images between playlists, which caused
+  “File not found” after an introductory clip. The player now keeps its image
+  mounted until the disc is closed.
+
 ## 1.9.1-bluray.1
 
 Base: official MPC-BE 1.9.1; libbluray 1.5.0 with local `mouse-page-v1` and

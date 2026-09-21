@@ -17,8 +17,10 @@ items below are not promised release dates or compatibility guarantees.
 - [x] Prepare the isolated portable profile and optional existing-settings import.
 - [x] Prepare English/Russian documentation and manual GitHub build configuration.
 
-The source is public and `main` is protected. The playback results above are
-from local builds; the first cloud build and published package are still pending.
+The source is public and `main` is protected. The
+[first cloud build](https://github.com/ttonych/mpc-be_bluray/actions/runs/35601595821)
+passed, and its ZIP integrity and clean profile were checked. The playback results
+above are from local builds; cloud-package playback tests and the release are pending.
 
 ## Before 1.9.1-bluray.1
 
@@ -35,7 +37,7 @@ from local builds; the first cloud build and published package are still pending
   direct pushes/history rewriting, and do not require a second person's approval.
 - [x] Add quick PR checks for documentation links/examples and RU/EN string IDs,
   format arguments and dialog controls; verify their error detection locally.
-- [ ] Run the full GitHub Actions build with dependencies prepared on the hosted
+- [x] Run the full GitHub Actions build with dependencies prepared on the hosted
   runner; inspect the ZIP contents and hashes.
 - [ ] Prepare a draft Release for the build commit, with its existing ZIP, checksum,
   component versions and bilingual release notes; keep it unpublished during validation.

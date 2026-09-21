@@ -161,9 +161,17 @@ first public release. Do not distribute the existing local candidate as a finish
 Actions are pinned by commit. Dependency downloads, the vcpkg baseline and build
 versions are pinned separately. This does not claim bit-for-bit reproducibility.
 The JDK bootstrap downloads the exact Temurin 21.0.12.1+1 archive and checks its
-SHA-256; `setup-java` cannot parse this four-part version. Local builds pass;
-the first successful cloud build is still pending. Its ZIP must be tested
-separately with madVR.
+SHA-256; `setup-java` cannot parse this four-part version.
+
+The [first successful hosted build](https://github.com/ttonych/mpc-be_bluray/actions/runs/35601595821)
+compiled the dependencies, libbluray, both JARs, MPC-BE and Russian resources,
+passed the component tests and packaged commit
+`c11fe3ba13a6588616091b1f58b92e2c138c3c05`. The downloaded ZIP's SHA-256,
+all 36 file entries and clean portable profile were verified. It remains an
+Actions candidate, with no published Release or cloud-package playback validation.
+Its SHA-256 is `a67afb8c037f21b8d10abb2be9576f990c83872aea3389ff90f4de586cf42e2b`.
+Test playback separately with madVR and complete the remaining roadmap checks
+before publishing a release.
 
 ## Updating MPC-BE
 

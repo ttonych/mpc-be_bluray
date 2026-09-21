@@ -180,6 +180,24 @@ Its SHA-256 is `a67afb8c037f21b8d10abb2be9576f990c83872aea3389ff90f4de586cf42e2b
 Test playback separately with madVR and complete the remaining roadmap checks
 before publishing a release.
 
+## Branded cloud candidate
+
+[Build 35607517684](https://github.com/ttonych/mpc-be_bluray/actions/runs/35607517684)
+completed on 2026-09-21 for commit
+`ba7adb79361419bac14ade704bf69a3b573fdb46`. Compilation, component tests and
+packaging passed. The downloaded 43-file ZIP passed hash, exact file-set,
+clean-profile and offline-link checks. EXE product version is `1.9.1-bluray.1`;
+player/resource numeric versions match at `1.9.1.12`.
+
+SHA-256: `665e732f32c0c1987e1baaff0a5f5af80667f80c32b059026f0933152c5e9eb0`.
+
+A draft prerelease holds this same ZIP and checksum; it is not published.
+Its RU/EN first-run and About dialogs were checked from the extracted cloud
+artifact. Setup cancellation preserved the seed profile; the installed registry
+remained unchanged. The current disc session uses external Temurin 21 and madVR;
+complete disc validation is still pending. Update the draft's validation record
+before publication. This documentation update does not replace or rebuild the ZIP.
+
 ## Updating MPC-BE
 
 Keep `origin` for this fork and `upstream` for the original MPC-BE repository.

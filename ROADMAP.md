@@ -27,7 +27,7 @@ above are from local builds; cloud-package playback tests and the release are pe
 - [x] Add the fork version to the player, EXE properties, ZIP and manifest;
   verify the Git revision and use fork releases for update checks.
 - [x] Include the bilingual user instructions in the ZIP and check its offline links.
-- [ ] Complete first-run UI checks in both languages: registry and detected INI
+- [x] Complete first-run UI checks in both languages: registry and detected INI
   availability, manual INI selection, switching sources, defaults and saved settings.
 - [ ] Recheck the clean package's profile isolation with both installed and
   portable source profiles; check importing and updating without changing source data.
@@ -39,7 +39,7 @@ above are from local builds; cloud-package playback tests and the release are pe
   format arguments and dialog controls; verify their error detection locally.
 - [x] Run the full GitHub Actions build with dependencies prepared on the hosted
   runner; inspect the ZIP contents and hashes.
-- [ ] Prepare a draft Release for the build commit, with its existing ZIP, checksum,
+- [x] Prepare a draft Release for the build commit, with its existing ZIP, checksum,
   component versions and bilingual release notes; keep it unpublished during validation.
 - [ ] Test that actual cloud-built ZIP with madVR: HDMV, BD-J, film start, menus,
   track/chapter controls and a clean first-run profile. Record what was tested.
@@ -55,8 +55,15 @@ registry-found / automatic-INI-missing display, manual file selection and cancel
 source switching, defaults and saved settings. Registry import left source values
 and key timestamps unchanged; manual import retained preferences while clearing
 history and shared BD-J paths. Replacing program files preserved the test INI and
-did not repeat setup. Availability states not present on that machine still need
-a separate UI check; the cloud ZIP must repeat the release checks above.
+did not repeat setup. A private UI host using the production dialog class and
+compiled resources checked no sources, detected INI only, and both sources, with
+process-local registry redirection and synthetic profiles. Source files were
+preserved and all temporary registry keys were removed.
+
+The branded cloud candidate also passed RU/EN first-run and About checks,
+including setup cancellation and an unchanged installed registry profile.
+Its build commit and checksum are recorded in the development guide. A draft
+Release holds the same ZIP; disc playback validation is still pending.
 
 ## After initial feedback
 

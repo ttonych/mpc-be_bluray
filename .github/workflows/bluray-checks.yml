@@ -18,3 +18,4 @@ jobs:
           python-version: '3.13'
       - run: python bluray/tools/test-public-check.py
       - run: python bluray/tools/check-public-tree.py
+      - run: python bluray/tools/check-docs-and-resources.py

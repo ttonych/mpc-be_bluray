@@ -26,17 +26,16 @@ Blu-ray**, identified as an unofficial modification. The former `1.9.1 dev` base
 has been replaced by the official release; the planned version has no `dev` suffix.
 
 Use `main` for reviewed, tested code, with short `feature/`, `fix/` and `update/`
-branches. A permanent develop branch is not needed. This is the intended public
-workflow; initial publication is still being prepared.
+branches. A permanent develop branch is not needed. The source repository is
+public; the first downloadable release is still being prepared.
 
 ## Branches and release flow
 
 Work locally on the appropriate short branch, run relevant tests, then send the
 prepared changes as a PR. Review the diff and passing checks before merging into
-`main`; delete the merged branch afterward. Configure `main` to require PRs and
-passing checks and to block direct pushes and history rewriting. A second person's
-approval is not required. These GitHub settings still need to be applied when
-the public repository is created.
+`main`; delete the merged branch afterward. Branch protection requires PRs and
+a passing `source-check`, including for administrators. Force pushes and branch
+deletion are disabled. A second person's approval is not required.
 
 The release sequence is:
 
@@ -51,7 +50,7 @@ The release sequence is:
    or substitute files after testing; any change requires another candidate check.
 
 The current workflow only uploads Actions artifacts. Draft creation and publication
-are separate release steps, not implemented automation or completed remote setup.
+are separate release steps and are not automated by the build workflow.
 Download and preserve the ZIP and its checksum before the artifacts' 14-day
 retention expires. Public releases use cloud-built binaries; local packages
 remain for development and diagnosis.
@@ -141,9 +140,11 @@ first public release. Do not distribute the existing local candidate as a finish
 ## GitHub Actions
 
 - [Quick checks](../../.github/workflows/bluray-checks.yml) run on pull requests
-  or manually. They check publication inputs and the checker itself.
-  Automated RU/EN resource consistency and documentation checks are still pending;
-  these are currently reviewed locally.
+  or manually. They check publication inputs and the checker itself, authored
+  Markdown links/examples, and the fork's RU/EN resource IDs, format arguments
+  and dialog controls. Translation quality and visual layout still need review.
+  Run `python bluray/tools/check-docs-and-resources.py` for the same documentation
+  and resource checks locally.
 - [Full build](../../.github/workflows/bluray-build.yml) runs only when manually
   requested, on `windows-2022`. It builds native libbluray, Java components,
   component tests, MPC-BE and Russian resources, then uploads a ZIP and checksum.

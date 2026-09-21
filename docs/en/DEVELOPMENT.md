@@ -24,9 +24,11 @@ The current base is upstream **1.9.1**, commit
 `d2c7b28a22ffe5ddd72632c9076d594ac6d2178f`. The first fork version is planned as
 `1.9.1-bluray.1`; another release on that base becomes `1.9.1-bluray.2`, and a
 release on a new base starts at, for example, `1.9.2-bluray.1`.
-The local player's product version still reads `1.9.1`; the package name and
-manifest identify the fork revision. The final in-app version label is pending.
-The repository name is `mpc-be_bluray`; the intended display name is **MPC-BE
+The title, About dialog and EXE product version show `1.9.1-bluray.1`.
+`include/BlurayVersion.h` and `bluray/versions.json` must agree; the build and
+packager check this. Numeric upstream file versions are retained for resource-DLL
+compatibility. Update checks read this fork's published releases, including prereleases.
+The repository name is `mpc-be_bluray`; the display name is **MPC-BE
 Blu-ray**, identified as an unofficial modification. The former `1.9.1 dev` base
 has been replaced by the official release; the planned version has no `dev` suffix.
 
@@ -129,6 +131,8 @@ For a public candidate, review and commit the source, rebuild, then package:
 
 ```powershell
 python bluray/tools/check-public-tree.py
+python -m pip install --require-hashes -r bluray/tools/requirements-package.txt
+python bluray/tools/test-package-docs.py
 python bluray/tools/package-player.py
 ```
 
@@ -138,9 +142,12 @@ marked with uncommitted changes and adds `-local` to its name. Packages go to
 program hashes, selects an explicit program file set and creates a clean INI.
 Java, madVR, personal profiles, disc data, logs and debugging symbols are excluded.
 
-The current candidate packager does not yet include these new user documents.
-Connecting the final bilingual instructions to the ZIP is required before the
-first public release. Do not distribute the existing local candidate as a finished release.
+The packager renders the overview, user guide and changelog in both languages
+as offline HTML from the same Markdown sources. Local links and anchors are
+validated; maintainer-only documents link to the exact build commit on GitHub.
+`Readme.html` and `Readme.ru.html` are the entry points. The pinned renderer is in
+`requirements-package.txt`. Use `--output-dir` for a separate output folder.
+Source changes after a clean build are rejected; rebuild the reviewed commit.
 
 ## GitHub Actions
 
@@ -219,7 +226,7 @@ public identity, for example a GitHub noreply address. Keep profiles, logs,
 screenshots, disc files, Java runtimes, private saves and machine paths out of
 commits. Preserve upstream author attribution and license notices.
 
-For the first release, finish the version label and packaged documentation,
-check the full proposed history, run the cloud build and test its ZIP. Publish
+Before a release, check the version label, packaged documentation and proposed
+history, run the cloud build and test its ZIP. Publish
 the tested package with its checksum and matching source tag as a prerelease.
 Keep English and Russian instructions/changelogs synchronized.

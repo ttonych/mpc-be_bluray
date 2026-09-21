@@ -23,13 +23,7 @@
 #include <afxwin.h>
 #include "afxdialogex.h"
 
-struct Version
-{
-	unsigned major;
-	unsigned minor;
-	unsigned patch;
-	unsigned revision;
-};
+#include "BlurayReleaseVersion.h"
 
 enum Update_Status
 {
@@ -44,7 +38,7 @@ class UpdateChecker
 	static inline bool bUpdating = false;
 	static inline CCritSec csUpdating;
 
-	static inline Version m_UpdateVersion = {};
+	static inline BlurayRelease::Version m_UpdateVersion = {};
 	static inline CString m_UpdateURL;
 
 public:

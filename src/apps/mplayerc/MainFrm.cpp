@@ -99,7 +99,7 @@ namespace LAVVideo
 
 #include "./Controls/MenuEx.h"
 
-#include "Version.h"
+#include "BlurayVersion.h"
 #include "Win10Api.h"
 #include "PlayerYouTube.h"
 
@@ -140,11 +140,11 @@ public:
 };
 
 
-static LPCWSTR s_strPlayerTitle = "MPC-BE "
+static LPCWSTR s_strPlayerTitle = _CRT_WIDE(MPCBE_BLURAY_NAME_STR) L" "
 #ifdef _WIN64
 	L"x64 "
 #endif
-	MPC_VERSION_WSTR
+	MPCBE_BLURAY_VERSION_WSTR
 #if (MPC_VERSION_STATUS == 0)
 	" dev"
 #endif

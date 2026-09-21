@@ -56,7 +56,12 @@ jobs:
       - name: Build player and Russian resources
         run: ./bluray/tools/build-player.ps1
       - name: Package clean candidate
-        run: python bluray/tools/package-player.py
+        run: |
+          python -m pip install --disable-pip-version-check --require-hashes -r bluray/tools/requirements-package.txt
+          if ($LASTEXITCODE) { throw 'Could not install the pinned documentation renderer.' }
+          python bluray/tools/test-package-docs.py
+          if ($LASTEXITCODE) { throw 'Packaged documentation tests failed.' }
+          python bluray/tools/package-player.py
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: mpc-be-bluray-candidate-x64

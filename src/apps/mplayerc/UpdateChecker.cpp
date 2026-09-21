@@ -26,7 +26,7 @@
 #include "rapidjsonHelper.h"
 #include "UpdateChecker.h"
 
-#include "Version.h"
+#include "BlurayVersion.h"
 
 // UpdateChecker
 
@@ -52,7 +52,7 @@ Update_Status UpdateChecker::CheckNewVersion()
 
 	Update_Status updatestatus = UPDATER_ERROR_CONNECT;
 	CHTTPAsync HTTPAsync;
-	if (SUCCEEDED(HTTPAsync.Connect(L"https://api.github.com/repos/Aleksoid1978/MPC-BE/releases/latest", http::connectTimeout))) {
+	if (SUCCEEDED(HTTPAsync.Connect(L"https://api.github.com/repos/ttonych/mpc-be_bluray/releases?per_page=100", http::connectTimeout))) {
 		constexpr auto sizeRead = 16 * KILOBYTE;
 		CStringA data;
 		DWORD dwSizeRead = 0;
@@ -67,22 +67,26 @@ Update_Status UpdateChecker::CheckNewVersion()
 		if (!data.IsEmpty()) {
 			updatestatus = UPDATER_ERROR_DATA;
 			rapidjson::Document json;
-			if (!json.Parse(data.GetString()).HasParseError()) {
-				CString tag_name;
-				if (getJsonValue(json, "tag_name", tag_name)) {
-					int n = swscanf_s(tag_name, L"%u.%u.%u.%u",
-									  &m_UpdateVersion.major, &m_UpdateVersion.minor, &m_UpdateVersion.patch, &m_UpdateVersion.revision);
-					if (n == 3 || n == 4) {
-						if (getJsonValue(json, "html_url", m_UpdateURL)) {
-							if (MPC_VERSION_MAJOR < m_UpdateVersion.major
-									|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR < m_UpdateVersion.minor
-									|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR == m_UpdateVersion.minor && MPC_VERSION_PATCH < m_UpdateVersion.patch
-									|| MPC_VERSION_MAJOR == m_UpdateVersion.major && MPC_VERSION_MINOR == m_UpdateVersion.minor && MPC_VERSION_PATCH == m_UpdateVersion.patch && MPC_VERSION_REV < m_UpdateVersion.revision) {
-								updatestatus = UPDATER_NEW_VERSION_IS_AVAILABLE;
-							} else {
-								updatestatus = UPDATER_NO_NEW_VERSION;
-							}
-						}
+			if (!json.Parse(data.GetString()).HasParseError() && json.IsArray()) {
+				// Include published prereleases: this fork is distributed for testing.
+				updatestatus = UPDATER_NO_NEW_VERSION;
+				const BlurayRelease::Version current = { MPC_VERSION_MAJOR, MPC_VERSION_MINOR, MPC_VERSION_PATCH, MPCBE_BLURAY_REVISION };
+				for (const auto& release : json.GetArray()) {
+					if (!release.IsObject()) {
+						continue;
+					}
+					bool draft = true;
+					CString tag, url;
+					BlurayRelease::Version candidate{};
+					if (getJsonValue(release, "draft", draft) && !draft
+							&& getJsonValue(release, "tag_name", tag)
+							&& BlurayRelease::Parse(std::wstring_view(tag.GetString(), tag.GetLength()), candidate)
+							&& candidate > current && candidate > m_UpdateVersion
+							&& getJsonValue(release, "html_url", url)
+							&& url.Find(L"https://github.com/ttonych/mpc-be_bluray/releases/tag/") == 0) {
+						m_UpdateVersion = candidate;
+						m_UpdateURL = url;
+						updatestatus = UPDATER_NEW_VERSION_IS_AVAILABLE;
 					}
 				}
 			}
@@ -111,15 +115,13 @@ UINT UpdateChecker::RunCheckForUpdateThread(LPVOID pParam)
 			nType = MB_OK | MB_ICONHAND;
 			break;
 		case UPDATER_NO_NEW_VERSION:
-			text.Format(IDS_USING_NEWER_VERSION, MPC_VERSION_WSTR);
+			text.Format(IDS_USING_NEWER_VERSION, MPCBE_BLURAY_VERSION_WSTR);
 			nType = MB_OK | MB_ICONINFORMATION;
 			break;
 		case UPDATER_NEW_VERSION_IS_AVAILABLE: {
 			CStringW versionStr;
-			versionStr.Format(L"%u.%u.%u", m_UpdateVersion.major, m_UpdateVersion.minor, m_UpdateVersion.patch);
-			if (m_UpdateVersion.revision) {
-				versionStr.AppendFormat(L".%u", m_UpdateVersion.revision);
-			}
+			versionStr.Format(L"%u.%u.%u-bluray.%u", m_UpdateVersion[0], m_UpdateVersion[1],
+				m_UpdateVersion[2], m_UpdateVersion[3]);
 			text.Format(IDS_NEW_UPDATE_AVAILABLE, versionStr);
 			nType = MB_YESNO | MB_ICONQUESTION;
 			break;

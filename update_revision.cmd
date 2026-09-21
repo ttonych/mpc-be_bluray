@@ -17,7 +17,7 @@ IF NOT EXIST %gitexe% GOTO :ÑHANGE_ÑHECK
 
 :GIT_OK
 
-FOR /F "delims=" %%A IN ('%gitexe% describe --long --match "[0-9]*" --exclude "*-*"') DO (
+FOR /F "delims=" %%A IN ('CALL %gitexe% describe --long --match "[0-9]*" --exclude "*-*"') DO (
   SET GIT_DESCRIBE_STR=%%A
 )
 
@@ -31,11 +31,11 @@ FOR /F "tokens=3 delims=-" %%A IN ("%GIT_DESCRIBE_STR%") DO (
 )
 IF %GIT_REV_HASH:~0,1%==g SET GIT_REV_HASH=%GIT_REV_HASH:~1%
 
-FOR /F "delims=" %%A IN ('%gitexe% symbolic-ref --short HEAD') DO (
+FOR /F "delims=" %%A IN ('CALL %gitexe% symbolic-ref --short HEAD') DO (
   SET GIT_REV_BRANCH=%%A
 )
 
-FOR /F "delims=" %%A IN ('%gitexe% log -1 --date^=format:%%Y-%%m-%%d --pretty^=format:%%ad') DO (
+FOR /F "delims=" %%A IN ('CALL %gitexe% log -1 --date^=format:%%Y-%%m-%%d --pretty^=format:%%ad') DO (
   SET GIT_REV_DATE=%%A
 )
 

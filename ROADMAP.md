@@ -24,9 +24,9 @@ above are from local builds; cloud-package playback tests and the release are pe
 
 ## Before 1.9.1-bluray.1
 
-- [ ] Finish the fork version label in the player and align it with the ZIP,
-  manifest, tag and release notes.
-- [ ] Include the bilingual user instructions in the ZIP and check its offline links.
+- [x] Add the fork version to the player, EXE properties, ZIP and manifest;
+  verify the Git revision and use fork releases for update checks.
+- [x] Include the bilingual user instructions in the ZIP and check its offline links.
 - [ ] Complete first-run UI checks in both languages: registry and detected INI
   availability, manual INI selection, switching sources, defaults and saved settings.
 - [ ] Recheck the clean package's profile isolation with both installed and
@@ -49,6 +49,14 @@ above are from local builds; cloud-package playback tests and the release are pe
 
 Release readiness means the remaining checks pass and the documentation matches
 the artifact users receive. A locally working EXE alone is not the release gate.
+
+Local candidate checks on 2026-09-21 passed: RU/EN first-run and About windows,
+registry-found / automatic-INI-missing display, manual file selection and cancellation,
+source switching, defaults and saved settings. Registry import left source values
+and key timestamps unchanged; manual import retained preferences while clearing
+history and shared BD-J paths. Replacing program files preserved the test INI and
+did not repeat setup. Availability states not present on that machine still need
+a separate UI check; the cloud ZIP must repeat the release checks above.
 
 ## After initial feedback
 

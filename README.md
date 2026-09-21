@@ -15,9 +15,10 @@ Fork version: **1.9.1-bluray.1**.
 
 ## Download and quick start
 
-Check [Releases](https://github.com/ttonych/mpc-be_bluray/releases) for published
-builds and their validation notes. The portable ZIP is for Windows x64, with
-English and Russian interfaces. Java and madVR are installed separately.
+Download [1.9.1-bluray.1 — Windows x64 ZIP](https://github.com/ttonych/mpc-be_bluray/releases/download/1.9.1-bluray.1/mpc-be_bluray-1.9.1-bluray.1-x64.zip).
+This is a preliminary release; see its [validation notes](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.1).
+The portable package includes English and Russian interfaces. Java and madVR
+are installed separately.
 Open `Readme.html` or `Readme.ru.html` in the extracted ZIP for offline instructions.
 
 1. Extract the candidate ZIP into a separate, writable folder.

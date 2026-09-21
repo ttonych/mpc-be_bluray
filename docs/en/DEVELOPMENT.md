@@ -21,7 +21,7 @@ Reconsider a separate library repository only if the maintained changes need
 to serve another player, such as a future MPC-HC integration.
 
 The current base is upstream **1.9.1**, commit
-`d2c7b28a22ffe5ddd72632c9076d594ac6d2178f`. The first fork version is planned as
+`d2c7b28a22ffe5ddd72632c9076d594ac6d2178f`. The first fork version is
 `1.9.1-bluray.1`; another release on that base becomes `1.9.1-bluray.2`, and a
 release on a new base starts at, for example, `1.9.2-bluray.1`.
 The title, About dialog and EXE product version show `1.9.1-bluray.1`.
@@ -30,11 +30,11 @@ packager check this. Numeric upstream file versions are retained for resource-DL
 compatibility. Update checks read this fork's published releases, including prereleases.
 The repository name is `mpc-be_bluray`; the display name is **MPC-BE
 Blu-ray**, identified as an unofficial modification. The former `1.9.1 dev` base
-has been replaced by the official release; the planned version has no `dev` suffix.
+has been replaced by the official release; the fork version has no `dev` suffix.
 
 Use `main` for reviewed, tested code, with short `feature/`, `fix/` and `update/`
 branches. A permanent develop branch is not needed. The source repository is
-public; the first downloadable release is still being prepared.
+public; [1.9.1-bluray.1](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.1) is available as a prerelease.
 
 ## Branches and release flow
 
@@ -174,29 +174,38 @@ The [first successful hosted build](https://github.com/ttonych/mpc-be_bluray/act
 compiled the dependencies, libbluray, both JARs, MPC-BE and Russian resources,
 passed the component tests and packaged commit
 `c11fe3ba13a6588616091b1f58b92e2c138c3c05`. The downloaded ZIP's SHA-256,
-all 36 file entries and clean portable profile were verified. It remains an
-Actions candidate, with no published Release or cloud-package playback validation.
+all 36 file entries and clean portable profile were verified. This historical
+Actions candidate was not published; its playback was not validated.
 Its SHA-256 is `a67afb8c037f21b8d10abb2be9576f990c83872aea3389ff90f4de586cf42e2b`.
-Test playback separately with madVR and complete the remaining roadmap checks
-before publishing a release.
+The published build and its validation are recorded below.
 
-## Branded cloud candidate
+## Published prerelease
 
-[Build 35607517684](https://github.com/ttonych/mpc-be_bluray/actions/runs/35607517684)
+[Build 35619821494](https://github.com/ttonych/mpc-be_bluray/actions/runs/35619821494)
 completed on 2026-09-21 for commit
-`ba7adb79361419bac14ade704bf69a3b573fdb46`. Compilation, component tests and
-packaging passed. The downloaded 43-file ZIP passed hash, exact file-set,
-clean-profile and offline-link checks. EXE product version is `1.9.1-bluray.1`;
-player/resource numeric versions match at `1.9.1.12`.
+`c6710779318cc73b2679ad7f79b5e3ae767dd41e`. It includes the separate menu audio
+and bounded file-read recovery fixes. Compilation, component tests and packaging
+passed. The downloaded 43-file ZIP passed hash, exact file-set, clean-profile
+and offline-link checks. EXE product version is `1.9.1-bluray.1`; player and
+Russian resource numeric versions match at `1.9.1.16`.
 
-SHA-256: `665e732f32c0c1987e1baaff0a5f5af80667f80c32b059026f0933152c5e9eb0`.
+SHA-256: `8a5b3f2a69b4c7be4f3205f442f0bf55aec6404c0ab449b7d482211d61ee5bc3`.
 
-A draft prerelease holds this same ZIP and checksum; it is not published.
-Its RU/EN first-run and About dialogs were checked from the extracted cloud
-artifact. Setup cancellation preserved the seed profile; the installed registry
-remained unchanged. The current disc session uses external Temurin 21 and madVR;
-complete disc validation is still pending. Update the draft's validation record
-before publication. This documentation update does not replace or rebuild the ZIP.
+RU/EN first-run and About windows passed inspection. Setup cancellation preserved
+the seed INI. Registry import left source values and key timestamps unchanged;
+manual import from a synthetic INI retained preferences without changing its
+source and cleared history and shared BD-J paths. Program files still match
+the cloud manifest. Grand Prix reached its menu and started its separate audio
+graph successfully. The tester confirmed this exact ZIP on A Knight’s Tale
+(BD-J) and Baby Boom (HDMV): menus, film start and menu recall. Grand Prix also
+passed menu music, pause/resume and film-start checks.
+
+[Release 1.9.1-bluray.1](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.1) was published on 2026-09-21
+as a prerelease with this same ZIP and checksum. Its source tag resolves to the
+build commit; public access and asset digests were verified.
+The previous candidate from run 35607517684 passed A Knight’s Tale and Baby Boom
+user checks but lacked the Grand Prix fixes and was not published.
+This documentation update does not rebuild or replace the release ZIP.
 
 ## Updating MPC-BE
 

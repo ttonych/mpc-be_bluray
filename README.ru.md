@@ -15,10 +15,10 @@
 
 ## Скачать и начать просмотр
 
-Опубликованные сборки и результаты их проверки смотрите в
-[Releases](https://github.com/ttonych/mpc-be_bluray/releases).
-Портативный ZIP предназначен для Windows x64 и содержит русский и английский
-интерфейсы. Java и madVR устанавливаются отдельно.
+Скачать [1.9.1-bluray.1 — ZIP для Windows x64](https://github.com/ttonych/mpc-be_bluray/releases/download/1.9.1-bluray.1/mpc-be_bluray-1.9.1-bluray.1-x64.zip).
+Это предварительный выпуск; [результаты проверки](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.1) указаны в его описании.
+Портативный комплект содержит русский и английский интерфейсы. Java и madVR
+устанавливаются отдельно.
 Инструкции без интернета: откройте `Readme.ru.html` или `Readme.html` из распакованного ZIP.
 
 1. Распакуйте тестовый ZIP в отдельную папку, доступную для записи.

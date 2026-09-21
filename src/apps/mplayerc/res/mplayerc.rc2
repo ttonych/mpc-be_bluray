@@ -10,7 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Add manually edited resources here...
 #include "resource.h"
-#include "Version.h"
+#include "BlurayVersion.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -181,17 +181,17 @@ BEGIN
             VALUE "FileVersion", MPC_VERSION_FULL_STR
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
 #ifdef _WIN64
-            VALUE "FileDescription", "MPC-BE x64"
+            VALUE "FileDescription", MPCBE_BLURAY_PRODUCT_STR
             VALUE "InternalName", "mpc-be64"
             VALUE "OriginalFilename", "mpc-be64.exe"
-            VALUE "ProductName", "MPC-BE x64"
+            VALUE "ProductName", MPCBE_BLURAY_PRODUCT_STR
 #else
-            VALUE "FileDescription", "MPC-BE"
+            VALUE "FileDescription", MPCBE_BLURAY_PRODUCT_STR
             VALUE "InternalName", "mpc-be"
             VALUE "OriginalFilename", "mpc-be.exe"
-            VALUE "ProductName", "MPC-BE"
+            VALUE "ProductName", MPCBE_BLURAY_PRODUCT_STR
 #endif
-            VALUE "ProductVersion", MPC_VERSION_STR
+            VALUE "ProductVersion", MPCBE_BLURAY_VERSION_STR
         END
     END
     BLOCK "VarFileInfo"

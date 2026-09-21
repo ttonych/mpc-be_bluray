@@ -11,13 +11,14 @@ Testing was performed with **madVR 210 x64**.
 
 This is an independent, experimental fork. Its current base is the official
 **MPC-BE 1.9.1 release**, with **libbluray 1.5.0** and two maintained local patches.
-The initial public version is being prepared as **1.9.1-bluray.1**.
+Fork version: **1.9.1-bluray.1**.
 
 ## Download and quick start
 
-The first public release is being prepared; there is no published download yet.
-The intended distribution is a portable ZIP for Windows x64, with English and
-Russian interface resources. Java and madVR are installed separately.
+Check [Releases](https://github.com/ttonych/mpc-be_bluray/releases) for published
+builds and their validation notes. The portable ZIP is for Windows x64, with
+English and Russian interfaces. Java and madVR are installed separately.
+Open `Readme.html` or `Readme.ru.html` in the extracted ZIP for offline instructions.
 
 1. Extract the candidate ZIP into a separate, writable folder.
 2. Start `mpc-be64.exe`. Choose whether to copy settings from your existing
@@ -75,8 +76,8 @@ of compatibility with every disc or every madVR version.
 - Disc decryption tools are not included; the disc contents must already be readable.
 
 The local build on the official 1.9.1 base has been checked with **Baby Boom
-(HDMV)** and **Ford v Ferrari (BD-J)**. A build produced by GitHub Actions will
-need its own playback check before release.
+(HDMV)** and **Ford v Ferrari (BD-J)**. Each cloud candidate needs a separate
+playback check; see its release notes for results specific to the downloadable ZIP.
 
 ## Documentation
 

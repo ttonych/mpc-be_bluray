@@ -3,11 +3,14 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import zipfile
+from package_docs import add_documents
 
 component = Path(__file__).resolve().parent.parent
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--allow-dirty', action='store_true', help='Local testing only; never used in public release workflows.')
+parser.add_argument('--output-dir', type=Path, help='Separate output folder; existing ZIPs are never overwritten.')
 args = parser.parse_args()
 source = component / 'out/mpc-be-bluray-x64'
 build = json.loads((source / 'build-manifest.json').read_text(encoding='utf-8-sig'))
@@ -15,6 +18,15 @@ if not build['portable_test']:
     raise SystemExit('Expected an isolated portable build.')
 if build['source_dirty'] and not args.allow_dirty:
     raise SystemExit('Commit the reviewed source first; dirty builds are for local testing only.')
+root = component.parent
+head = subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
+dirty = subprocess.check_output(['git', '-C', str(root), 'status', '--porcelain', '--untracked-files=normal'], text=True).strip()
+if not args.allow_dirty and (dirty or head != build['source_commit']):
+    raise SystemExit('Source changed since the player build; rebuild the reviewed commit first.')
+versions = json.loads((component / 'versions.json').read_text(encoding='utf-8'))
+version = versions['mpc_be']['version'] + '-bluray.' + str(versions['bluray_revision'])
+if build.get('fork_version') != version:
+    raise SystemExit('Build version differs from versions.json; rebuild before packaging.')
 programs = {
     'mpc-be64.exe', 'Lang/mpcresources.ru.dll', 'bluray-4.dll', 'udfread-3.dll',
     'freetype.dll', 'libxml2.dll', 'brotlicommon.dll', 'brotlidec.dll', 'bz2.dll',
@@ -45,12 +57,12 @@ data['mpc-be64.ini'] = ('[Settings]\r\nBluRayMenus=1\r\nChapterMarker=1\r\nMulti
     'KeepHistory=0\r\nRememberFilePos=0\r\n[OSD]\r\nShowOSD=5\r\n[Audio]\r\nVolume=25\r\n'
     '[WebServer]\r\nEnableWebServer=0\r\n[Video]\r\nVideoRenderer=7\r\n'
     '[PortableTest]\r\nFirstRunComplete=0\r\n').encode('utf-16')
+add_documents(data, root, build['source_commit'])
 data['build-manifest.json'] = json.dumps(build, indent=2).encode()
 manifest = {'files': {name: hashlib.sha256(content).hexdigest() for name, content in sorted(data.items())}}
 data['package-manifest.json'] = json.dumps(manifest, indent=2).encode()
-version = build['upstream']['version'] + '-bluray.' + str(build['bluray_revision'])
 name = 'mpc-be_bluray-' + version + ('-local' if args.allow_dirty else '') + '-x64'
-folder = component / 'out/packages'
+folder = args.output_dir or component / 'out/packages'
 folder.mkdir(parents=True, exist_ok=True)
 target = folder / (name + '.zip')
 with zipfile.ZipFile(target, 'x', zipfile.ZIP_DEFLATED, compresslevel=6) as z:

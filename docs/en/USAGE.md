@@ -151,6 +151,10 @@ against the source player's folder during import, so keep that folder if it
 contains filters. madVR and other filters keep their own potentially shared
 settings; changing those component settings can affect other players.
 
+The player checks releases of **MPC-BE Blu-ray**, including published prereleases,
+not releases of the original MPC-BE. It opens the release page; it does not install
+or replace files automatically.
+
 For an update, close the test player and back up its INI and disc data, including
 any custom storage folder. Extract the new package separately and replace only
 the program files after checking the release instructions. Do not overwrite

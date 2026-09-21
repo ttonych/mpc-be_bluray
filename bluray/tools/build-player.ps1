@@ -57,9 +57,24 @@ if (!(Test-Path -LiteralPath $ini)) {
     [IO.File]::WriteAllText($ini, $seed, [Text.Encoding]::Unicode)
 }
 $versions = Get-Content -LiteralPath (Join-Path $component 'versions.json') -Raw | ConvertFrom-Json
+$sourceCommit = (& git -C $source rev-parse HEAD).Trim()
+$revisionHeader = Get-Content -LiteralPath (Join-Path $source 'revision.h') -Raw
+if ($revisionHeader -notmatch '#define REV_HASH "([0-9a-f]{7,40})"' -or !$sourceCommit.StartsWith($Matches[1])) {
+    throw 'Generated revision.h does not identify the current source commit.'
+}
+$forkVersion = "$($versions.mpc_be.version)-bluray.$($versions.bluray_revision)"
+$exeVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $target 'mpc-be64.exe'))
+$resourceVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $target 'Lang\mpcresources.ru.dll'))
+if ($exeVersion.ProductVersion -ne $forkVersion -or $exeVersion.ProductName -ne 'MPC-BE Blu-ray x64') {
+    throw 'EXE branding differs from versions.json; check include/BlurayVersion.h.'
+}
+if ($resourceVersion.FileVersion -ne $exeVersion.FileVersion) {
+    throw 'Russian resources and player have different numeric versions.'
+}
 $manifest = [ordered]@{
     upstream = $versions.mpc_be
-    source_commit = (& git -C $source rev-parse HEAD)
+    fork_version = $forkVersion
+    source_commit = $sourceCommit
     source_dirty = [bool](& git -C $source status --porcelain --untracked-files=normal)
     bluray_revision = $versions.bluray_revision
     portable_test = !$StandardProfile

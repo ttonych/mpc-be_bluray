@@ -22,7 +22,7 @@
 #include "AboutDlg.h"
 #include "DSUtil/FileHandle.h"
 
-#include "Version.h"
+#include "BlurayVersion.h"
 
 extern "C" char *GetFFmpegCompiler();
 extern "C" char *GetlibavcodecVersion();
@@ -50,7 +50,7 @@ BOOL CAboutDlg::OnInitDialog()
 	m_appname += L" (64-bit)";
 #endif
 
-	m_strVersionNumber.Append(MPC_VERSION_WSTR);
+	m_strVersionNumber.Append(MPCBE_BLURAY_VERSION_WSTR);
 #if (MPC_VERSION_STATUS == 0)
 	m_strVersionNumber.Append(L" dev");
 #endif
@@ -131,7 +131,7 @@ void CAboutDlg::OnHomepage(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CAboutDlg::OnGitHub(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecuteW(m_hWnd, L"open", L"https://github.com/Aleksoid1978/MPC-BE", nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", L"https://github.com/ttonych/mpc-be_bluray", nullptr, nullptr, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }

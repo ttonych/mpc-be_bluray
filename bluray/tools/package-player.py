@@ -31,7 +31,8 @@ for name in sorted(programs):
         raise SystemExit('Program hash mismatch: ' + name)
     data[name] = content
 license_names = {'MPC-BE-License.txt', 'libbluray.txt', 'libudfread.txt', 'freetype.txt',
-                 'libxml2.txt', 'brotli.txt', 'bzip2.txt', 'libpng.txt', 'zlib.txt', 'libiconv.txt'}
+                 'libxml2.txt', 'brotli.txt', 'bzip2.txt', 'libpng.txt', 'zlib.txt', 'libiconv.txt',
+                 'vcpkg-port.txt'}
 for name in sorted(license_names):
     path = source / 'licenses' / name
     if path.is_symlink():

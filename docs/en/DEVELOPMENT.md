@@ -155,9 +155,10 @@ first public release. Do not distribute the existing local candidate as a finish
 
 Actions are pinned by commit. Dependency downloads, the vcpkg baseline and build
 versions are pinned separately. This does not claim bit-for-bit reproducibility.
-At initial preparation, local builds pass; the workflow has not yet run on GitHub.
-The first cloud build must validate runner prerequisites and produce an artifact
-that is separately tested with madVR.
+The JDK bootstrap downloads the exact Temurin 21.0.12.1+1 archive and checks its
+SHA-256; `setup-java` cannot parse this four-part version. Local builds pass;
+the first successful cloud build is still pending. Its ZIP must be tested
+separately with madVR.
 
 ## Updating MPC-BE
 

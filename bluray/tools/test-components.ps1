@@ -3,9 +3,13 @@ $ErrorActionPreference = 'Stop'
 foreach ($name in @('bdj-argb','disc-storage','media-monitor','menu-background','menu-audio','file-retry','menu-color','menu-coordinates','menu-rle','playback-clock','portable-profile','release-version')) {
     & (Join-Path $PSScriptRoot "test-$name.ps1")
 }
-foreach ($component in @('mouse-page','bdj-toggle')) {
+foreach ($component in @('mouse-page','native','bdj-toggle')) {
     python (Join-Path $PSScriptRoot 'test-libbluray-local-patch.py') --component $component
     if ($LASTEXITCODE) { throw "Patch regression failed: $component" }
+}
+foreach ($name in @('process-query-hook', 'playmark-seek')) {
+    python (Join-Path $PSScriptRoot "test-$name.py")
+    if ($LASTEXITCODE) { throw "Regression failed: $name" }
 }
 & (Join-Path $PSScriptRoot 'test-bdj-toggle.ps1') -JavaHome $JavaHome
 python (Join-Path $PSScriptRoot 'test-public-check.py')

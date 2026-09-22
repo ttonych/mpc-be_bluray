@@ -1,0 +1,13 @@
+{
+  "upstream": "1.5.0",
+  "local_revision": "playmark-seek-v1",
+  "source_sha256": "f676408e91a5d321abf8b8d4dfdae36205c297dab5c54c3ec519639025f474a2",
+  "files": {
+    "src/libbluray/bluray.c": {
+      "base": "a9ccbd93749bc853c3abb7dda6aed0ef65a7491cba3b91afe21d8bf0550656c0",
+      "patched": "92b7536c42359d00e3b9ad2240ed209aed36bd97bbd035c8629882f5d45832b9"
+    }
+  },
+  "after": "mouse-page-v1",
+  "patch_sha256": "344d535a224ff57e7fafeb0469beab054ab318dd532e5007e5d049ecf5a8b865"
+}

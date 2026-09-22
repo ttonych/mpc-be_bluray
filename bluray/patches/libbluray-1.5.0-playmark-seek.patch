@@ -1,0 +1,13 @@
+--- a/src/libbluray/bluray.c
++++ b/src/libbluray/bluray.c
+@@ -1647,7 +1647,9 @@
+     bd->next_mark_pos = (uint64_t)-1;
+     for (ii = 0; ii < bd->title->mark_list.count; ii++) {
+         uint64_t pos = (uint64_t)bd->title->mark_list.mark[ii].title_pkt * 192L;
+-        if (pos > bd->s_pos) {
++        /* The seek target is the next packet to be read. Include marks at
++         * that position, even when several marks share an access unit. */
++        if (pos >= bd->s_pos) {
+             bd->next_mark = ii;
+             bd->next_mark_pos = pos;
+             break;

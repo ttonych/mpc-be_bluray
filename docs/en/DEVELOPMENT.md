@@ -114,7 +114,7 @@ It is not the mode used for the initial public test package.
 
 ## Checks and packaging
 
-`test-components.ps1` runs the synthetic C++ checks, both patch regression suites,
+`test-components.ps1` runs the synthetic C++ checks, native/Java patch regression suites,
 HAVi tests against the built JAR, and publication-checker tests. It needs no disc.
 Disc-specific probes include `test-mouse-submenus.ps1 -Disc 'V:\'` for Baby Boom
 and `test-menu-background.ps1 -KingdomDisc 'V:\'` for The Kingdom. Use the matching
@@ -236,8 +236,8 @@ does not expose the subclip ID. No additional library patch is required.
 Use a separate `update/libbluray-<version>` branch and a reviewed PR, following
 the same local-first process as MPC-BE updates.
 
-The [two local patches](../../bluray/patches/README.en.md) have base/result hashes
-and regression tests. Neither has been submitted to or accepted by upstream.
+The [local patches](../../bluray/patches/README.en.md) have base/result hashes
+and regression tests. They have not been submitted to or accepted by upstream.
 Before changing libbluray, check whether upstream has fixed the original cause.
 Remove a patch only after its regression test passes without it, or port it
 deliberately to the new source and review the changed behavior.

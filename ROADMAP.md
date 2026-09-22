@@ -75,6 +75,12 @@ on Grand Prix. The tested ZIP was published without rebuilding.
 
 ## Changes awaiting the next release
 
+- Fixed lost playmarks during BD-J menu returns and narrowed an unsafe Windows
+  process-state write. Local builds and regression tests passed. On the tested
+  UHD disc with madVR and Java 21, the user confirmed no further menu problems
+  or crashes; the log confirms five returns with restored graphics and a normal
+  close. Broader disc/stability checks remain part of the next release validation.
+  These changes are not in the published ZIP.
 - Fixed Blu-ray ISO images being unmounted between playlists. Local checks with
   Baby Boom and madVR covered the introductory clips, menu, film start, return to
   the menu, the Open ISO dialog, and releasing the image on disc/player close.

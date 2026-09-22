@@ -9,6 +9,7 @@
     "source_sha256": "f676408e91a5d321abf8b8d4dfdae36205c297dab5c54c3ec519639025f474a2",
     "patches": [
       "mouse-page-v1",
+      "playmark-seek-v1",
       "bdj-toggle-v1"
     ]
   },

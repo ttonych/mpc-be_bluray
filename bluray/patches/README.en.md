@@ -2,11 +2,47 @@
 
 [Русский](README.md) · [Project maintenance](../../docs/en/DEVELOPMENT.md)
 
-Run the commands below from the `mpc-be_bluray` repository root. Neither patch
-has been submitted to or accepted by upstream VideoLAN. They are maintained
+Run the commands below from the `mpc-be_bluray` repository root. These patches
+have not been submitted to or accepted by upstream VideoLAN. They are maintained
 changes for this integration, whose menu output is adapted for madVR.
 Before the first check, complete the [full local build](../../docs/en/DEVELOPMENT.md#local-build):
 rebuilding the player below requires both the native DLL and the two JARs.
+
+## Navigation: playmark-seek-v1 (2026-09-22)
+
+After a seek, the original tracker skipped marks at exactly the next packet to
+read. Several marks can share that packet because they map to the same random
+access unit. A BD-J menu waiting for one of those marks could remain on its
+background video after a return from the film.
+
+The patch includes the seek position when finding the next mark. Events still
+fire only after reading past that packet, once per mark until another seek.
+It changes native `bluray.c`; it contains no disc-specific conditions and does
+not change the JARs or rendering. On the tested UHD BD-J disc, the user confirmed
+that changing the menu language and returning from the film worked. Five
+recorded returns delivered both marks and produced visible graphics again.
+
+The native build applies `mouse-page-v1` followed by `playmark-seek-v1` because
+both touch `bluray.c`. It accepts only a complete pristine, intermediate, or
+fully patched state, with exact hashes; unexpected edits stop the build.
+
+```powershell
+python bluray/tools/libbluray-local-patch.py --component native
+python bluray/tools/test-libbluray-local-patch.py --component native
+python bluray/tools/test-playmark-seek.py
+```
+
+The synthetic regression compiles the actual tracking functions and covers equal
+positions, multiple marks per access unit, one-time delivery, backward seeks,
+skipped marks, empty lists and large byte offsets. The original code fails it.
+The same mark loss and corrected delivery were reproduced with the disc in a
+separate native probe; this does not establish full disc compatibility.
+
+For deliberate maintenance, export this component with `--component playmark-seek
+--export --base-source <source-with-mouse-page-v1>`. That base must match the
+mouse patch's hashes. Maintain the mouse patch in a separate source copy before
+applying the mark patch; never fold the two patches into one by exporting the
+combined tree as `mouse-page`.
 
 ## BD-J: bdj-toggle-v1 (2026-09-20)
 

@@ -10,7 +10,7 @@ video renderer.
 Testing was performed with **madVR 210 x64**.
 
 This is an independent, experimental fork. Its current base is the official
-**MPC-BE 1.9.1 release**, with **libbluray 1.5.0** and two maintained local patches.
+**MPC-BE 1.9.1 release**, with **libbluray 1.5.0** and maintained local patches.
 Fork version: **1.9.1-bluray.1**.
 
 This fork’s modifications were developed with the help of ChatGPT Astra.

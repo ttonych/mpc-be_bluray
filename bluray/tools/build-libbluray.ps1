@@ -34,7 +34,7 @@ if ((Get-FileHash -Algorithm SHA256 -LiteralPath $archive).Hash.ToLowerInvariant
 if (!(Test-Path -LiteralPath (Join-Path $sourceRoot 'meson.build'))) {
     Invoke-Checked -Executable $python -Arguments @((Join-Path $PSScriptRoot 'extract-source.py'), $archive, (Join-Path $projectRoot 'vendor'))
 }
-Invoke-Checked -Executable $python -Arguments @((Join-Path $PSScriptRoot 'libbluray-local-patch.py'), '--source', $sourceRoot)
+Invoke-Checked -Executable $python -Arguments @((Join-Path $PSScriptRoot 'libbluray-local-patch.py'), '--source', $sourceRoot, '--component', 'native')
 foreach ($pc in @('freetype2.pc', 'libxml-2.0.pc', 'libudfread.pc')) {
     if (!(Test-Path -LiteralPath (Join-Path $DependencyRoot "lib\pkgconfig\$pc"))) {
         throw "Missing dependency: $DependencyRoot\lib\pkgconfig\$pc"
@@ -81,8 +81,10 @@ try {
 
     [ordered]@{
         libbluray = '1.5.0'
-        local_revision = 'mouse-page-v1'
-        local_patch_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $projectRoot 'patches\libbluray-1.5.0-mouse-page.patch')).Hash.ToLowerInvariant()
+        local_revisions = @('mouse-page-v1', 'playmark-seek-v1')
+        local_patches = @('mouse-page', 'playmark-seek') | ForEach-Object {
+            @{ component = $_; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $projectRoot "patches\libbluray-1.5.0-$_.patch")).Hash.ToLowerInvariant() }
+        }
         source_sha256 = $expectedHash
         architecture = 'x64'
         compiler = 'MSVC'

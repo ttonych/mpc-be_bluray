@@ -7,13 +7,16 @@ This file covers this fork. The original MPC-BE history remains in
 
 ## Unreleased
 
+- Fixed a buffer overrun when one read spans three or more playlist files.
+  Short Blu-ray startup clips could corrupt memory and crash playback or Java.
+  Added guarded regression coverage for reads across multiple files and EOF.
+
 - Fixed missing BD-J menu graphics after a language change or return from the
   film when navigation seeks exactly to a playmark. libbluray now preserves
   all marks mapped to the packet at that position.
-- Fixed an unsafe Windows process-state rewrite in the compatibility hook:
-  only the intended flag is changed, preserving concurrent updates. Added
-  error and buffer checks. No further crashes were reported in the local retest
-  with Java 21; this does not establish the cause of every earlier JVM crash.
+- Corrected an unsafe Windows process-state rewrite in a disabled compatibility
+  hook, with error and buffer checks. The hook is not compiled into these builds;
+  that correction does not explain or fix their observed Java crashes.
 - Fixed premature unmounting of Blu-ray ISO images between playlists, which caused
   “File not found” after an introductory clip. The player now keeps its image
   mounted until the disc is closed.

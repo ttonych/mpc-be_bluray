@@ -37,15 +37,22 @@ HotSpot**. A JDK is not required for playback.
 - [Windows x64 JRE ZIP](https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jre_x64_windows_hotspot_21.0.12.1_1.zip).
 - [Publisher's SHA-256 file](https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jre_x64_windows_hotspot_21.0.12.1_1.zip.sha256.txt).
 
-Extract Java, then select its root folder under **Blu-ray → Java and data →
-Java (x64)**. That folder must contain `bin\server\jvm.dll` (or
-`jre\bin\server\jvm.dll` for a runtime laid out that way). Click **Apply / OK**
-and reopen the disc. Restart MPC-BE completely after replacing the Java runtime.
-No system installation or `JAVA_HOME` change is needed when you set an explicit path.
+Place Java in the **`jre` folder beside `mpc-be64.exe`**, so that
+`jre\bin\server\jvm.dll` exists. Alternatively, open **Blu-ray → Java and data →
+Change…** and select its root folder. No system installation is needed.
 
-An empty Java path enables automatic search when a disc opens. The settings
-page checks for files; finding them does not prove that a particular JVM can
-run BD-J. Keep both bundled libbluray JAR files beside the player.
+The settings page shows the found Java version and folder. After a BD-J disc
+starts, **In use** identifies the runtime actually loaded. **Change… → Find Java**
+clears a manual selection and resumes the search. Apply the settings; if Java is
+already loaded, restart MPC-BE before using a different runtime.
+
+A manual folder takes priority. Otherwise the player checks `jre`, then the
+legacy `java` folder beside the EXE, `JAVA_HOME`, registered Windows installations
+and `PATH`, selecting the first Java 21 x64 runtime with AWT. An incompatible
+manual choice reports an error instead of silently choosing another Java.
+Portable discovery stores no absolute Java path, so `jre` can move with the player.
+File checks do not guarantee that every Java 21 distribution will run BD-J;
+use the tested runtime. Keep both bundled libbluray JAR files beside the player.
 
 Java 25 failed with `Failed initializing SecurityManager` in this project's
 tests. Use the tested Java 21 runtime; a higher major version is not automatically

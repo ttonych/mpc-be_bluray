@@ -10,6 +10,7 @@
 #include "BlurayMenuBackground.h"
 #include "BlurayMenuAudioPlayer.h"
 #include "BluraySettings.h"
+#include "BlurayJavaRuntime.h"
 #include "BlurayDiscStorage.h"
 #include "BlurayCatalog.h"
 #include "DSUtil/Profile.h"
@@ -50,7 +51,7 @@ struct CBlurayMenu::State
     bool bdjActive = false, hasBdj = false, firstPlayPending = false;
     bool bdjGraphicsVisible = false;
     bool menuBackground = false;
-    bool bdjPq2020 = false;
+    bool graphicsPq2020 = false;
     int playbackRequest = -1;
     BlurayArgbBuffer argb;
     BlurayMediaMonitor media;
@@ -153,15 +154,11 @@ struct CBlurayMenu::State
     }
     void Paint(Plane& p, size_t at, UINT index) {
         const auto& c = p.palette[index];
-        const double y = 1.164383 * (int(c.Y) - 16);
-        const double cb = int(c.Cb) - 128, cr = int(c.Cr) - 128;
-        auto clamp = [](double v) { return uint8_t(std::clamp(v + .5, 0.0, 255.0)); };
-        // HDMV prototype: HD BT.709; SD and UHD matrices need separate validation.
         p.indices[at] = uint8_t(index);
+        // Keep each region's original Y'CrCb/alpha until colour conversion.
+        // A later draw may use another palette without changing this region.
         auto dst = &p.pixels[at * 4];
-        dst[0] = clamp(y + 2.112402 * cb);
-        dst[1] = clamp(y - .213249 * cb - .532909 * cr);
-        dst[2] = clamp(y + 1.792741 * cr);
+        dst[0] = c.Y; dst[1] = c.Cr; dst[2] = c.Cb;
         dst[3] = index == 255 ? 0 : c.T;
     }
     static void Overlay(void* context, const BD_OVERLAY* ov) {
@@ -259,16 +256,16 @@ struct CBlurayMenu::State
         struct ResetPresenting { bool& flag; ~ResetPresenting() { flag = false; } } reset{presenting};
         CComPtr<IMadVROsdServices> currentOsd = osd;
         bool pq2020 = false;
-        if (bdjActive && title && playitem < title->clip_count) {
+        if (title && playitem < title->clip_count) {
             const auto& clip = title->clips[playitem];
             if (clip.video_stream_count) pq2020 = BlurayMenuColor::IsPq2020(clip.video_streams[0]);
         }
-        if (pq2020 != bdjPq2020) {
-            bdjPq2020 = pq2020;
-            Log("bdj_hdr_graphics", bdjPq2020, playlist);
-            // Retain original pixels so an HDR/SDR clip change also updates a
-            // static menu, without another Java FLUSH or repeated conversion.
-            for (auto& p : planes) if (p.indices.empty()) p.dirty = true;
+        if (pq2020 != graphicsPq2020) {
+            graphicsPq2020 = pq2020;
+            Log("hdr_graphics", graphicsPq2020, playlist);
+            // Retain original pixels/palette so an HDR/SDR clip change updates
+            // a static menu without another FLUSH or repeated conversion.
+            for (auto& p : planes) p.dirty = true;
         }
         bool redraw = false;
         for (UINT i = 1; i < planes.size(); ++i) {
@@ -285,8 +282,13 @@ struct CBlurayMenu::State
                 void* bits = nullptr;
                 bitmap = CreateDIBSection(nullptr, &bi, DIB_RGB_COLORS, &bits, nullptr, 0);
                 if (!bitmap) { error = ResStr(IDS_BD_MENU_BITMAP_ALLOC_FAILED); return; }
-                BlurayMenuColor::CopyToOsd(static_cast<uint8_t*>(bits), p.pixels.data(),
-                    p.pixels.size(), bdjPq2020 && p.indices.empty());
+                if (p.indices.empty()) {
+                    BlurayMenuColor::CopyToOsd(static_cast<uint8_t*>(bits), p.pixels.data(),
+                        p.pixels.size(), graphicsPq2020);
+                } else {
+                    BlurayMenuColor::CopyYcbcrToOsd(static_cast<uint8_t*>(bits), p.pixels.data(),
+                        p.pixels.size(), graphicsPq2020);
+                }
             }
             const HRESULT hr = currentOsd->OsdSetBitmap(name, bitmap, nullptr, 0, 0, 0, true,
                 i == BD_OVERLAY_IG ? 20 : 10, 0, BITMAP_STRETCH_TO_OUTPUT | BITMAP_USER_INTERFACE);
@@ -495,11 +497,13 @@ bool CBlurayMenu::Start(const CStringW& root, CStringW& error)
     m->bd = m->bd_init();
     if (!m->bd) { error = ResStr(IDS_BD_OPEN_FAILED); return false; }
     BluraySettings settings; settings.Load();
-    if (!settings.javaHome.IsEmpty()) {
-        m->bd_set_player_setting_str(m->bd, BLURAY_PLAYER_JAVA_HOME, CW2A(settings.javaHome, CP_UTF8));
-    } else if (PathFileExistsW(directory + L"java\\bin\\server\\jvm.dll")) {
-        m->bd_set_player_setting_str(m->bd, BLURAY_PLAYER_JAVA_HOME, CW2A(directory + L"java", CP_UTF8));
-    }
+    const auto loadedJava = BlurayJava::Loaded();
+    const auto java = loadedJava.home.empty() ? BlurayJava::Resolve(settings.javaHome.GetString()) : loadedJava;
+    // A process cannot safely switch JVMs. Keep the running VM until restart.
+    // If none qualifies, use the EXE file as a deliberately non-directory home:
+    // libbluray must not fall back to an incompatible system Java. HDMV still works.
+    const auto javaHome = java.Valid() ? java.home : BlurayJava::ModulePath();
+    m->bd_set_player_setting_str(m->bd, BLURAY_PLAYER_JAVA_HOME, CW2A(javaHome.c_str(), CP_UTF8));
     const auto profile=settings.advanced[BlurayAdvanced::Profile];
     m->bd_set_player_setting(m->bd, BLURAY_PLAYER_SETTING_PLAYER_PROFILE, profile.enabled?profile.number:BLURAY_PLAYER_PROFILE_1_v1_0);
     m->bd_set_player_setting(m->bd, BLURAY_PLAYER_SETTING_REGION_CODE, settings.region);
@@ -524,7 +528,7 @@ bool CBlurayMenu::Start(const CStringW& root, CStringW& error)
     m->legacyUoPolicy=!settings.advanced[BlurayAdvanced::Restrictions].enabled;
     m->uoLevel=settings.advanced[BlurayAdvanced::Restrictions].number;
     if (info && info->num_bdj_titles && !info->bdj_handled) {
-        error = ResStr(IDS_BD_JAVA_UNAVAILABLE); return false;
+        error = ResStr(java.Valid() ? IDS_BD_JAVA_UNAVAILABLE : IDS_BD_JAVA_ERROR + int(java.error) - 1); return false;
     }
     if (!info || !info->bluray_detected || !info->first_play_supported) {
         error = ResStr(IDS_BD_FIRST_PLAY_UNSUPPORTED); return false;

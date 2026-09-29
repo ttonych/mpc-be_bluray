@@ -58,7 +58,52 @@ int main(int argc, char** argv) {
         assert(converted[3] == n);
         previous = converted[0];
     }
-    std::puts("PASS: metadata gating, PQ anchors, HDR white/yellow, SDR identity, alpha, clipping, neutral ramp, repeat conversion");
+    // HDMV carries limited-range Y'CbCr palettes, including HDR menus.
+    // The same retained indices must render correctly after palette changes
+    // and SDR/HDR transitions without modifying the source or alpha.
+    std::array<BD_PG_PALETTE_ENTRY, 256> palette{};
+    palette[0] = {16, 128, 128, 255};     // black
+    palette[1] = {159, 128, 128, 255};    // PQ white is only RGB 167 without conversion
+    palette[2] = {159, 128, 128, 64};     // antialiased white
+    palette[3] = {136, 133, 63, 255};     // BT.2020 PQ yellow near reference white
+    palette[4] = {235, 128, 128, 255};    // SDR white
+    palette[5] = {97, 200, 80, 255};      // chromatic SDR control
+    palette[255] = {235, 128, 128, 255};  // reserved transparent index wins
+    const auto originalPalette = palette;
+    const uint8_t indices[] = {0, 1, 2, 3, 4, 5, 255};
+    uint8_t yuv[sizeof(indices) * 4];
+    for (size_t i = 0; i < sizeof(indices); ++i) {
+        const auto& c = palette[indices[i]];
+        yuv[4*i] = c.Y; yuv[4*i+1] = c.Cr; yuv[4*i+2] = c.Cb;
+        yuv[4*i+3] = indices[i] == 255 ? 0 : c.T;
+    }
+    const auto originalYuv = std::vector<uint8_t>(yuv, yuv + sizeof(yuv));
+    uint8_t paletteSdr[sizeof(indices) * 4], paletteHdr[sizeof(paletteSdr)], restored[sizeof(paletteSdr)];
+    BlurayMenuColor::CopyYcbcrToOsd(paletteSdr, yuv, sizeof(yuv), false);
+    assert(paletteSdr[0] == 0 && paletteSdr[3] == 255);
+    assert(paletteSdr[4] == 167 && paletteSdr[5] == 167 && paletteSdr[6] == 167);
+    assert(paletteSdr[16] == 255 && paletteSdr[17] == 255 && paletteSdr[18] == 255);
+    assert(paletteSdr[20] == 0 && paletteSdr[21] == 66 && paletteSdr[22] == 223);
+    BlurayMenuColor::CopyYcbcrToOsd(paletteHdr, yuv, sizeof(yuv), true);
+    assert(paletteHdr[4] == 255 && paletteHdr[5] == 255 && paletteHdr[6] == 255);
+    assert(paletteHdr[8] == 255 && paletteHdr[9] == 255 && paletteHdr[10] == 255 && paletteHdr[11] == 64);
+    assert(paletteHdr[12] < 10 && paletteHdr[13] > 245 && paletteHdr[14] > 245);
+    for (size_t i = 3; i < sizeof(paletteHdr); i += 4) assert(paletteHdr[i] == paletteSdr[i]);
+    for (size_t i = 24; i < 28; ++i) assert(paletteHdr[i] == 0 && paletteSdr[i] == 0);
+    BlurayMenuColor::CopyYcbcrToOsd(restored, yuv, sizeof(yuv), false);
+    assert(!std::memcmp(paletteSdr, restored, sizeof(restored)));
+    assert(!std::memcmp(palette.data(), originalPalette.data(), sizeof(palette)));
+    assert(!std::memcmp(yuv, originalYuv.data(), sizeof(yuv)));
+    // A regional palette update changes only that region's retained colour.
+    yuv[4] = 16; yuv[5] = yuv[6] = 128;
+    BlurayMenuColor::CopyYcbcrToOsd(restored, yuv, sizeof(yuv), true);
+    assert(restored[4] == 0 && restored[5] == 0 && restored[6] == 0 && restored[7] == 255);
+    assert(!std::memcmp(restored + 8, paletteHdr + 8, sizeof(restored) - 8));
+    const uint8_t flat[] = {159,128,128,255, 159,128,128,255, 16,128,128,255};
+    uint8_t flatResult[sizeof(flat)];
+    BlurayMenuColor::CopyYcbcrToOsd(flatResult, flat, sizeof(flat), true);
+    assert(!std::memcmp(flatResult, flatResult + 4, 4) && flatResult[0] == 255 && flatResult[8] == 0);
+    std::puts("PASS: metadata, PQ anchors, ARGB and HDMV palettes, SDR identity, alpha, colour/clip transitions");
 
     // Optional reconstruction of a diagnostic TGA; not a live player capture.
     if (argc == 3) {

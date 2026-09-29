@@ -432,14 +432,16 @@ STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX "Java for BD-J menus",IDC_STATIC,4,4,266,58
-    LTEXT "Java (x64):",IDC_STATIC,11,21,47,10
-    COMBOBOX IDC_BD_JAVA_HOME,61,18,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON "Browse...",IDC_BD_BROWSE_JAVA,214,17,49,16
-    LTEXT "",IDC_BD_JAVA_STATUS,11,38,252,20
-    GROUPBOX "Remembering settings and playback position",IDC_STATIC,4,69,266,63
-    CONTROL "Save disc settings and progress",IDC_BD_PERSISTENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,83,252,11
-    LTEXT "If supported by the disc menu.",IDC_STATIC,22,97,240,10
+    GROUPBOX "Java for BD-J menus",IDC_STATIC,4,4,266,64
+    LTEXT "Found:",IDC_BD_JAVA_LABEL,11,17,60,10
+    LTEXT "",IDC_BD_JAVA_VERSION,74,17,189,10,SS_ENDELLIPSIS
+    LTEXT "Folder:",IDC_STATIC,11,34,30,10
+    EDITTEXT IDC_BD_JAVA_HOME,44,31,164,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON "Change...",IDC_BD_BROWSE_JAVA,214,30,49,16
+    LTEXT "",IDC_BD_JAVA_STATUS,11,49,252,18
+    GROUPBOX "Remembering settings and playback position",IDC_STATIC,4,73,266,59
+    CONTROL "Save disc settings and progress",IDC_BD_PERSISTENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,87,252,11
+    LTEXT "If supported by the disc menu.",IDC_STATIC,22,99,240,10
     PUSHBUTTON "Disc list...",IDC_BD_DISCS,11,111,110,16
     GROUPBOX "File locations",IDC_STATIC,4,139,266,70
     LTEXT "Saves:",IDC_STATIC,11,155,48,10
@@ -449,6 +451,35 @@ BEGIN
     COMBOBOX IDC_BD_CACHE_ROOT,61,174,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON "Browse...",IDC_BD_BROWSE_CACHE,214,173,49,16
     LTEXT "Changing folders does not move existing files.",IDC_STATIC,11,194,252,10
+END
+
+STRINGTABLE
+BEGIN
+    IDS_BD_JAVA_DETECTED "Found:"
+    IDS_BD_JAVA_USING "In use:"
+    IDS_BD_JAVA_VERSION "%s %s · %u-bit"
+    IDS_BD_JAVA_UNKNOWN "Not found"
+    IDS_BD_JAVA_RESTART "Java selection changed. Apply settings and restart the player."
+    44409 "Java 21 (64-bit) was not found. Click Change to select its folder."
+    44410 "Enter the full path to the Java 21 folder."
+    44411 "The jvm.dll file is damaged or is not a Java library."
+    44412 "Java for Windows x64 is required. Select the 64-bit Intel/AMD version."
+    44413 "Could not identify this Java version. Select a complete Java 21 runtime."
+    44414 "Java 21 is required. This Java version is not supported."
+    44415 "AWT graphics components are missing. Select a complete Java 21 runtime."
+END
+
+IDD_BD_JAVA_PICKER DIALOGEX 0, 0, 300, 83
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Java for BD-J menus"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "Select the Java 21 (64-bit) folder.",IDC_STATIC,7,9,286,10
+    EDITTEXT IDC_BD_JAVA_HOME,7,24,232,14,ES_AUTOHSCROLL
+    PUSHBUTTON "Browse...",IDC_BD_BROWSE_JAVA,245,23,48,16
+    PUSHBUTTON "Find Java",IDC_BD_JAVA_FIND,7,60,68,16
+    DEFPUSHBUTTON "OK",IDOK,187,60,50,16
+    PUSHBUTTON "Cancel",IDCANCEL,243,60,50,16
 END
 
 IDD_BD_DISCS DIALOGEX 0, 0, 462, 275

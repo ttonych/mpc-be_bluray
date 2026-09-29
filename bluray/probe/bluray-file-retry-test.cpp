@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Exercise the real file reader with injected Win32 read failures.
+// Exercise the real file reader across playlist parts and Win32 read failures.
 #include "../../src/filters/parser/BaseSplitter/stdafx.h"
 #include <cassert>
 #include <cstdio>
@@ -67,6 +67,34 @@ int wmain(int argc, wchar_t** argv)
     assert(reader.Read(data, sizeof(data), error) == sizeof(data));
     assert(error == ERROR_SUCCESS && offset == -200 && reads == 2);
     reader.Close();
+    // A single splitter read can span several tiny playlist parts. Check every
+    // starting byte and read length, including EOF, with guards on both sides.
+    items.push_back(a);
+    items.push_back(a);
+    assert(reader.OpenFiles(items));
+    for (UINT start = 0; start < 16; ++start) {
+        for (UINT count = 1; count <= 20; ++count) {
+            BYTE guarded[128];
+            memset(guarded, 0xcd, sizeof(guarded));
+            assert(reader.Seek(start, FILE_BEGIN) == start);
+            const UINT available = (std::min)(count, 16 - start);
+            const UINT actual = reader.Read(guarded + 16, count, error);
+            bool correct = actual == available && error == ERROR_SUCCESS;
+            for (UINT i = 0; i < sizeof(guarded); ++i) {
+                const BYTE want = i >= 16 && i < 16 + available
+                    ? expected[(start + i - 16) % sizeof(expected)] : 0xcd;
+                if (guarded[i] != want) correct = false;
+            }
+            if (!correct) {
+                fprintf(stderr, "Playlist read/guard mismatch: start=%u count=%u returned=%u expected=%u\n",
+                        start, count, actual, available);
+                reader.Close();
+                DeleteFileW(argv[1]);
+                return 1;
+            }
+        }
+    }
+    reader.Close();
     assert(DeleteFileW(argv[1]));
-    puts("File reader: raw-file retry, persistent failure bound, successful recovery and playlist offsets passed.");
+    puts("File reader: bounded retries, playlist offsets and guarded multi-part reads passed.");
 }

@@ -21,7 +21,7 @@ PAIRS = (
     ('bluray/patches/README.en.md', 'bluray/patches/README.md'),
 )
 DIALOGS = ('IDD_PPAGEBLURAY', 'IDD_BD_ADVANCED', 'IDD_BD_JAVA',
-           'IDD_BD_DISCS', 'IDD_PORTABLE_SETUP')
+           'IDD_BD_DISCS', 'IDD_PORTABLE_SETUP', 'IDD_BD_JAVA_PICKER')
 FORMAT = re.compile(r'%[-+ #0]*\d*(?:\.\d+)?(?:I64|I32|hh|ll|h|l|z|t|j)?[diuoxXfFeEgGaAcCsSpn]')
 
 
@@ -90,7 +90,7 @@ def check_resources(root):
             if number is None:
                 problems.append(f'{name}: undefined string {key}')
                 continue
-            if not (44110 <= number <= 44403):
+            if not (44110 <= number <= 44415):
                 continue
             if number in strings:
                 problems.append(f'{name}: duplicate string {number}')

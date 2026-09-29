@@ -581,6 +581,9 @@
     <ClInclude Include="PPageBluray.h">
       <Filter>Player Options</Filter>
     </ClInclude>
+    <ClInclude Include="BlurayJavaRuntime.h">
+      <Filter>Player Options</Filter>
+    </ClInclude>
     <ClInclude Include="BluraySettings.h">
       <Filter>Player Options</Filter>
     </ClInclude>

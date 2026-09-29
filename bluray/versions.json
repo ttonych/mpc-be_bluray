@@ -3,7 +3,7 @@
     "version": "1.9.1",
     "commit": "d2c7b28a22ffe5ddd72632c9076d594ac6d2178f"
   },
-  "bluray_revision": 1,
+  "bluray_revision": 2,
   "libbluray": {
     "version": "1.5.0",
     "source_sha256": "f676408e91a5d321abf8b8d4dfdae36205c297dab5c54c3ec519639025f474a2",

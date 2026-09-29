@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "BlurayDialogs.h"
 #include "BlurayMenu.h"
+#include "BlurayJavaRuntime.h"
 
 namespace BlurayUi {
 bool Contains(const CStringW& text, const CStringW& filter) {
@@ -50,18 +51,33 @@ CStringW DisplayValue(int field, BlurayAdvanced::Value value) {
 }
 void FillValue(CComboBox& combo, int field, BlurayAdvanced::Value value) {
     combo.ResetContent();
-    for (const auto& choice : ValueChoices(field)) combo.AddString(choice.first);
-    const CStringW text = DisplayValue(field, value);
-    const int index = combo.FindStringExact(-1, text);
-    if (index >= 0) combo.SetCurSel(index); else combo.SetWindowTextW(text);
+    const auto choices = ValueChoices(field);
+    int selected = -1;
+    for (size_t i = 0; i < choices.size(); ++i) {
+        const auto& choice = choices[i];
+        const int item = combo.AddString(choice.first);
+        combo.SetItemData(item, i);
+        if (value.enabled == choice.second.enabled && (!value.enabled || value.number == choice.second.number)) selected = int(i);
+    }
+    // Translations may give an explicit preset and the default identical labels.
+    if (selected >= 0) {
+        for (int item = 0; item < combo.GetCount(); ++item) {
+            if (combo.GetItemData(item) == DWORD_PTR(selected)) { combo.SetCurSel(item); break; }
+        }
+    } else combo.SetWindowTextW(DisplayValue(field, value));
     combo.LimitText(160);
 }
 bool ReadValue(CComboBox& combo, int field, BlurayAdvanced::Value& value) {
+    const auto choices = ValueChoices(field);
+    const int selected = combo.GetCurSel();
+    if (selected >= 0) {
+        const auto choice = combo.GetItemData(selected);
+        if (choice < choices.size()) { value = choices[choice].second; return true; }
+    }
     CStringW text;
-    if (combo.GetCurSel() >= 0) combo.GetLBText(combo.GetCurSel(), text);
-    else combo.GetWindowTextW(text);
+    combo.GetWindowTextW(text);
     text.Trim();
-    for (const auto& choice : ValueChoices(field)) if (text == choice.first) { value = choice.second; return true; }
+    for (const auto& choice : choices) if (text == choice.first) { value = choice.second; return true; }
     uint32_t number;
     if (!BlurayAdvanced::Parse(text.GetString(), number) || !BlurayAdvanced::Valid(field, number)) {
         AfxMessageBox(ResStr(IDS_BD_BAD_NUMBER), MB_ICONEXCLAMATION); combo.SetFocus(); return false;
@@ -225,16 +241,45 @@ void CBlurayAdvancedDlg::OnEditorBlur() {
     CommitValue();
 }
 
+BEGIN_MESSAGE_MAP(CBlurayJavaPickerDlg, CDialog)
+    ON_BN_CLICKED(IDC_BD_BROWSE_JAVA, OnBrowse)
+    ON_BN_CLICKED(IDC_BD_JAVA_FIND, OnFind)
+END_MESSAGE_MAP()
+BOOL CBlurayJavaPickerDlg::OnInitDialog() {
+    __super::OnInitDialog();
+    SetDlgItemTextW(IDC_BD_JAVA_HOME, m_initial);
+    return TRUE;
+}
+void CBlurayJavaPickerDlg::OnBrowse() {
+    CStringW path; GetDlgItemTextW(IDC_BD_JAVA_HOME, path);
+    CFolderPickerDialog picker(path.IsEmpty() ? nullptr : path.GetString(), OFN_PATHMUSTEXIST, this);
+    if (picker.DoModal() == IDOK) SetDlgItemTextW(IDC_BD_JAVA_HOME, picker.GetPathName());
+}
+void CBlurayJavaPickerDlg::OnOK() {
+    CStringW path; GetDlgItemTextW(IDC_BD_JAVA_HOME, path); path.Trim();
+    const auto runtime = BlurayJava::Inspect(path.GetString());
+    if (!runtime.Valid()) {
+        AfxMessageBox(ResStr(IDS_BD_JAVA_ERROR + int(runtime.error) - 1), MB_ICONEXCLAMATION);
+        GetDlgItem(IDC_BD_JAVA_HOME)->SetFocus(); return;
+    }
+    choice = path; EndDialog(IDOK);
+}
+void CBlurayJavaPickerDlg::OnFind() {
+    // Empty means search, not a snapshot of the current result. This remains
+    // portable when the player and its jre folder are moved together.
+    choice.Empty(); EndDialog(IDOK);
+}
+
 BEGIN_MESSAGE_MAP(CBlurayJavaDlg, CDialog)
     ON_CONTROL_RANGE(BN_CLICKED, IDC_BD_BROWSE_JAVA, IDC_BD_BROWSE_CACHE, OnBrowse)
-    ON_CONTROL_RANGE(CBN_EDITCHANGE, IDC_BD_JAVA_HOME, IDC_BD_CACHE_ROOT, OnPathChanged)
-    ON_CONTROL_RANGE(CBN_SELCHANGE, IDC_BD_JAVA_HOME, IDC_BD_CACHE_ROOT, OnPathChanged)
+    ON_CONTROL_RANGE(CBN_EDITCHANGE, IDC_BD_PERSIST_ROOT, IDC_BD_CACHE_ROOT, OnPathChanged)
+    ON_CONTROL_RANGE(CBN_SELCHANGE, IDC_BD_PERSIST_ROOT, IDC_BD_CACHE_ROOT, OnPathChanged)
     ON_BN_CLICKED(IDC_BD_PERSISTENT, OnPersistent)
     ON_BN_CLICKED(IDC_BD_DISCS, OnDiscs)
+    ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 void CBlurayJavaDlg::DoDataExchange(CDataExchange* dx) {
     __super::DoDataExchange(dx);
-    DDX_Control(dx, IDC_BD_JAVA_HOME, m_java);
     DDX_Control(dx, IDC_BD_PERSIST_ROOT, m_persistent);
     DDX_Control(dx, IDC_BD_CACHE_ROOT, m_cache);
 }
@@ -245,7 +290,6 @@ BOOL CBlurayJavaDlg::OnInitDialog() {
         combo.AddString(ResStr(label)); combo.LimitText(32760);
         if (value.IsEmpty()) combo.SetCurSel(0); else combo.SetWindowTextW(value);
     };
-    fill(m_java, IDS_BD_AUTO_SEARCH, m_settings.javaHome);
     fill(m_persistent, IDS_BD_PLAYER_FOLDER, m_settings.persistentRoot);
     fill(m_cache, IDS_BD_PLAYER_FOLDER, m_settings.cacheRoot);
     CheckDlgButton(IDC_BD_PERSISTENT, m_settings.persistent ? BST_CHECKED : BST_UNCHECKED);
@@ -257,35 +301,55 @@ CStringW CBlurayJavaDlg::PathValue(CComboBox& combo, UINT label) const {
     text.Trim(); if (text == ResStr(label)) text.Empty(); return text;
 }
 void CBlurayJavaDlg::UpdateJavaStatus() {
-    const CStringW path = PathValue(m_java, IDS_BD_AUTO_SEARCH);
-    UINT status = IDS_BD_JAVA_AUTO;
-    if (!path.IsEmpty()) status = PathFileExistsW(path + L"\\bin\\server\\jvm.dll") || PathFileExistsW(path + L"\\jre\\bin\\server\\jvm.dll")
-        ? IDS_BD_JAVA_FOUND : IDS_BD_JAVA_NOT_FOUND;
-    SetDlgItemTextW(IDC_BD_JAVA_STATUS, ResStr(status));
+    const auto selected = BlurayJava::Resolve(m_settings.javaHome.GetString());
+    const auto loaded = BlurayJava::Loaded();
+    const bool active = !loaded.home.empty();
+    const auto& shown = active ? loaded : selected;
+    SetDlgItemTextW(IDC_BD_JAVA_LABEL, ResStr(active ? IDS_BD_JAVA_USING : IDS_BD_JAVA_DETECTED));
+    CStringW title;
+    if (!shown.version.empty()) {
+        title.Format(ResStr(IDS_BD_JAVA_VERSION), shown.vendor.empty() ? L"Java" : shown.vendor.c_str(), shown.version.c_str(), shown.bits);
+    } else title = ResStr(IDS_BD_JAVA_UNKNOWN);
+    SetDlgItemTextW(IDC_BD_JAVA_VERSION, title);
+    SetDlgItemTextW(IDC_BD_JAVA_HOME, shown.home.c_str());
+    CStringW note;
+    if (BlurayJava::NeedsRestart(selected, loaded)) note = ResStr(IDS_BD_JAVA_RESTART);
+    else if (!shown.Valid()) note = ResStr(IDS_BD_JAVA_ERROR + int(shown.error) - 1);
+    SetDlgItemTextW(IDC_BD_JAVA_STATUS, note);
+    GetDlgItem(IDC_BD_JAVA_STATUS)->ShowWindow(note.IsEmpty() ? SW_HIDE : SW_SHOW);
 }
-void CBlurayJavaDlg::OnPathChanged(UINT) { if (!m_loading) { UpdateJavaStatus(); m_modified(); } }
+void CBlurayJavaDlg::OnShowWindow(BOOL show, UINT status) {
+    __super::OnShowWindow(show, status);
+    if (show && !m_loading) UpdateJavaStatus();
+}
+void CBlurayJavaDlg::OnPathChanged(UINT) { if (!m_loading) m_modified(); }
 void CBlurayJavaDlg::OnPersistent() { m_settings.persistent = IsDlgButtonChecked(IDC_BD_PERSISTENT) == BST_CHECKED; m_modified(); }
 void CBlurayJavaDlg::OnBrowse(UINT id) {
-    CComboBox* combos[] = {&m_java, &m_persistent, &m_cache};
-    auto& combo = *combos[id - IDC_BD_BROWSE_JAVA];
-    const auto path = PathValue(combo, id == IDC_BD_BROWSE_JAVA ? IDS_BD_AUTO_SEARCH : IDS_BD_PLAYER_FOLDER);
+    if (id == IDC_BD_BROWSE_JAVA) {
+        const auto found = BlurayJava::Resolve(m_settings.javaHome.GetString());
+        CBlurayJavaPickerDlg picker(m_settings.javaHome, found.home.c_str(), this);
+        if (picker.DoModal() == IDOK) {
+            if (picker.choice != m_settings.javaHome) { m_settings.javaHome = picker.choice; m_modified(); }
+            UpdateJavaStatus();
+        }
+        return;
+    }
+    auto& combo = id == IDC_BD_BROWSE_PERSIST ? m_persistent : m_cache;
+    const auto path = PathValue(combo, IDS_BD_PLAYER_FOLDER);
     CFolderPickerDialog picker(path.IsEmpty() ? nullptr : path.GetString(), OFN_PATHMUSTEXIST, this);
     if (picker.DoModal() == IDOK) { combo.SetCurSel(-1); combo.SetWindowTextW(picker.GetPathName()); OnPathChanged(0); }
 }
 bool CBlurayJavaDlg::CommitPaths() {
-    CStringW values[] = {PathValue(m_java, IDS_BD_AUTO_SEARCH), PathValue(m_persistent, IDS_BD_PLAYER_FOLDER), PathValue(m_cache, IDS_BD_PLAYER_FOLDER)};
-    CComboBox* combos[] = {&m_java, &m_persistent, &m_cache};
-    for (int i = 0; i < 3; ++i) {
+    CStringW values[] = {PathValue(m_persistent, IDS_BD_PLAYER_FOLDER), PathValue(m_cache, IDS_BD_PLAYER_FOLDER)};
+    CComboBox* combos[] = {&m_persistent, &m_cache};
+    for (int i = 0; i < 2; ++i) {
         const auto& value = values[i];
         if (!value.IsEmpty() && (!std::filesystem::path(value.GetString()).is_absolute()
             || value.Find(L'"') >= 0 || value.Find(L'\n') >= 0 || value.Find(L'\r') >= 0)) {
             AfxMessageBox(ResStr(IDS_BD_BAD_PATH), MB_ICONEXCLAMATION); combos[i]->SetFocus(); return false;
         }
     }
-    if (!values[0].IsEmpty() && !PathFileExistsW(values[0] + L"\\bin\\server\\jvm.dll") && !PathFileExistsW(values[0] + L"\\jre\\bin\\server\\jvm.dll")) {
-        AfxMessageBox(ResStr(IDS_BD_BAD_JAVA), MB_ICONEXCLAMATION); m_java.SetFocus(); return false;
-    }
-    m_settings.javaHome = values[0]; m_settings.persistentRoot = values[1]; m_settings.cacheRoot = values[2]; return true;
+    m_settings.persistentRoot = values[0]; m_settings.cacheRoot = values[1]; return true;
 }
 void CBlurayJavaDlg::OnDiscs() {
     // Catalogue operations concern saved settings, not unapplied folder edits.

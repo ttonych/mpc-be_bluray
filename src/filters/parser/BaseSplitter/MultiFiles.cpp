@@ -139,7 +139,7 @@ UINT CMultiFiles::Read(BYTE* lpBuf, UINT nCount, DWORD& dwError)
 		bool retried = false;
 again:
 		DWORD nNumberOfBytesRead = 0;
-		if (!ReadFile(m_hFile, lpBuf, nCount - dwRead, &nNumberOfBytesRead, nullptr)) {
+		if (!ReadFile(m_hFile, lpBuf + dwRead, nCount - dwRead, &nNumberOfBytesRead, nullptr)) {
 			dwError = GetLastError();
 			// A persistent read failure must not spin forever on the UI/graph thread.
 			if (!retried && Reopen()) {
@@ -159,7 +159,6 @@ again:
 
 		if (dwRead != nCount && (nCurPart == SIZE_T_MAX || nCurPart < m_strFiles.size() - 1)) {
 			OpenPart(nCurPart + 1);
-			lpBuf += dwRead;
 		}
 	} while (nCount != dwRead && (nCurPart == SIZE_T_MAX || nCurPart < m_strFiles.size() - 1));
 

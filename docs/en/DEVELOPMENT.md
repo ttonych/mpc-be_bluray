@@ -208,6 +208,40 @@ The previous candidate from run 35607517684 passed A Knight’s Tale and Baby Bo
 user checks but lacked the Grand Prix fixes and was not published.
 This documentation update does not rebuild or replace the release ZIP.
 
+## Second prerelease candidate
+
+[Build 36602524325](https://github.com/ttonych/mpc-be_bluray/actions/runs/36602524325)
+completed on 2026-09-29 for commit
+`06f315fc2d9056a175b859984773dccb59745bfd`, version `1.9.1-bluray.2`.
+Local and cloud component tests, x64/Russian builds and publication checks passed.
+The exact 45-file ZIP passed its checksum, manifest, clean-profile, license,
+patch-provenance and offline-link checks. It is attached to an unpublished draft
+with bilingual notes. These validation notes do not change its build commit or files.
+
+SHA-256: `8e0c4cc0c3398039e1c9b179a5ed32b53a1180d939bec245e063f1be3328e5ff`.
+
+Separate copies extracted from this archive were checked with madVR 210 x64
+and external Eclipse Temurin JRE 21.0.12.1+1:
+
+- Streets of Fire: HDR HDMV menu colours, chapter selection, film start,
+  popup and top-menu return.
+- Baby Boom: opening the ISO directly, both introductory clips, main menu,
+  film start and top-menu return. The image stayed mounted across playlists
+  and was released on disc close; the pre-existing user mount was preserved.
+- Casino Royale (2006): initial Blu-ray notice, BD-J menu, film start, popup
+  and top-menu return. The loaded JVM came from the test player's `jre` folder.
+- RU/EN first-run screens and default profiles; Java settings with found,
+  running and missing-runtime states, manual selection and the restart notice.
+  The English manual choice persisted, while cancelling the Russian change
+  preserved automatic discovery. First-run completion persisted in both profiles.
+
+Program hashes still matched the archive after testing. Source registry values
+and key timestamps remained unchanged; test players and their ISO mounts were
+closed. The original crash disc, full-film playback, all-disc compatibility,
+stereoscopic output and broader HDR accuracy were not revalidated in this run.
+The reader fix also has 320 guarded-read cases and prior local disc checks;
+those remain distinct from this archive's playback evidence.
+
 ## Updating MPC-BE
 
 Keep `origin` for this fork and `upstream` for the original MPC-BE repository.

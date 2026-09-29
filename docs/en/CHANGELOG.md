@@ -7,6 +7,10 @@ This file covers this fork. The original MPC-BE history remains in
 
 ## Unreleased
 
+- Corrected faded HDMV menu graphics on HDR Blu-ray discs. Indexed menu colours
+  now use the associated video's BT.2020/PQ conversion for the madVR bitmap OSD,
+  including palette updates and transitions between SDR and HDR clips.
+
 - Fixed a buffer overrun when one read spans three or more playlist files.
   Short Blu-ray startup clips could corrupt memory and crash playback or Java.
   Added guarded regression coverage for reads across multiple files and EOF.

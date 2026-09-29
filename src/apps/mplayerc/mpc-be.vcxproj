@@ -324,6 +324,7 @@
     <ClInclude Include="PPageDVD.h" />
     <ClInclude Include="PPageBluray.h" />
     <ClInclude Include="BluraySettings.h" />
+    <ClInclude Include="BlurayJavaRuntime.h" />
     <ClInclude Include="PortableTest.h" />
     <ClInclude Include="PortableProfileImport.h" />
     <ClInclude Include="..\..\..\include\PortableTestConfig.h" />

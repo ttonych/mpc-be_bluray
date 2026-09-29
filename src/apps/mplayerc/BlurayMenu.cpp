@@ -10,6 +10,7 @@
 #include "BlurayMenuBackground.h"
 #include "BlurayMenuAudioPlayer.h"
 #include "BluraySettings.h"
+#include "BlurayJavaRuntime.h"
 #include "BlurayDiscStorage.h"
 #include "BlurayCatalog.h"
 #include "DSUtil/Profile.h"
@@ -496,11 +497,13 @@ bool CBlurayMenu::Start(const CStringW& root, CStringW& error)
     m->bd = m->bd_init();
     if (!m->bd) { error = ResStr(IDS_BD_OPEN_FAILED); return false; }
     BluraySettings settings; settings.Load();
-    if (!settings.javaHome.IsEmpty()) {
-        m->bd_set_player_setting_str(m->bd, BLURAY_PLAYER_JAVA_HOME, CW2A(settings.javaHome, CP_UTF8));
-    } else if (PathFileExistsW(directory + L"java\\bin\\server\\jvm.dll")) {
-        m->bd_set_player_setting_str(m->bd, BLURAY_PLAYER_JAVA_HOME, CW2A(directory + L"java", CP_UTF8));
-    }
+    const auto loadedJava = BlurayJava::Loaded();
+    const auto java = loadedJava.home.empty() ? BlurayJava::Resolve(settings.javaHome.GetString()) : loadedJava;
+    // A process cannot safely switch JVMs. Keep the running VM until restart.
+    // If none qualifies, use the EXE file as a deliberately non-directory home:
+    // libbluray must not fall back to an incompatible system Java. HDMV still works.
+    const auto javaHome = java.Valid() ? java.home : BlurayJava::ModulePath();
+    m->bd_set_player_setting_str(m->bd, BLURAY_PLAYER_JAVA_HOME, CW2A(javaHome.c_str(), CP_UTF8));
     const auto profile=settings.advanced[BlurayAdvanced::Profile];
     m->bd_set_player_setting(m->bd, BLURAY_PLAYER_SETTING_PLAYER_PROFILE, profile.enabled?profile.number:BLURAY_PLAYER_PROFILE_1_v1_0);
     m->bd_set_player_setting(m->bd, BLURAY_PLAYER_SETTING_REGION_CODE, settings.region);
@@ -525,7 +528,7 @@ bool CBlurayMenu::Start(const CStringW& root, CStringW& error)
     m->legacyUoPolicy=!settings.advanced[BlurayAdvanced::Restrictions].enabled;
     m->uoLevel=settings.advanced[BlurayAdvanced::Restrictions].number;
     if (info && info->num_bdj_titles && !info->bdj_handled) {
-        error = ResStr(IDS_BD_JAVA_UNAVAILABLE); return false;
+        error = ResStr(java.Valid() ? IDS_BD_JAVA_UNAVAILABLE : IDS_BD_JAVA_ERROR + int(java.error) - 1); return false;
     }
     if (!info || !info->bluray_detected || !info->first_play_supported) {
         error = ResStr(IDS_BD_FIRST_PLAY_UNSUPPORTED); return false;

@@ -36,8 +36,9 @@ Open `Readme.html` or `Readme.ru.html` in the extracted ZIP for offline instruct
    See the [installation steps](docs/en/USAGE.md#setup-and-madvr).
    The menu graphics implementation uses madVR; menu support with other
    renderers is not currently provided.
-4. For BD-J, install the tested **Eclipse Temurin JRE 21.0.12.1+1, Windows x64,
-   HotSpot**, and select its folder under **Blu-ray → Java and data**.
+4. For BD-J, extract the tested **Eclipse Temurin JRE 21.0.12.1+1, Windows x64,
+   HotSpot** into `jre` beside the player, or select its folder under
+   **Blu-ray → Java and data → Change…**.
    See the [Java setup instructions and official download](docs/en/USAGE.md#java-for-bd-j).
    HDMV menus do not need Java.
 5. Open the whole disc or its `BDMV\index.bdmv` file. Opening an individual

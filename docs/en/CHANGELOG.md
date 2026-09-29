@@ -15,6 +15,11 @@ This file covers this fork. The original MPC-BE history remains in
   Short Blu-ray startup clips could corrupt memory and crash playback or Java.
   Added guarded regression coverage for reads across multiple files and EOF.
 
+- Simplified Java settings to show the found or running version and folder.
+  Added portable `jre` discovery and shared Java 21 x64/AWT validation for settings
+  and disc startup. Manual selection takes priority; changing a running JVM
+  requires restarting the player.
+
 - Fixed missing BD-J menu graphics after a language change or return from the
   film when navigation seeks exactly to a playmark. libbluray now preserves
   all marks mapped to the packet at that position.

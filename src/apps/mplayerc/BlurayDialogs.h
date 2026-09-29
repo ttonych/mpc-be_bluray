@@ -48,10 +48,24 @@ protected:
     DECLARE_MESSAGE_MAP()
 };
 
+class CBlurayJavaPickerDlg : public CDialog {
+    CStringW m_initial;
+public:
+    CStringW choice;
+    CBlurayJavaPickerDlg(const CStringW& selected, const CStringW& found, CWnd* parent)
+        : CDialog(IDD_BD_JAVA_PICKER, parent), m_initial(selected.IsEmpty() ? found : selected), choice(selected) {}
+protected:
+    BOOL OnInitDialog() override;
+    void OnOK() override;
+    afx_msg void OnBrowse();
+    afx_msg void OnFind();
+    DECLARE_MESSAGE_MAP()
+};
+
 class CBlurayJavaDlg : public CDialog {
     BluraySettings& m_settings;
     std::function<void()> m_modified;
-    CComboBox m_java, m_persistent, m_cache;
+    CComboBox m_persistent, m_cache;
     bool m_loading = true;
     CStringW PathValue(CComboBox& combo, UINT defaultLabel) const;
     void UpdateJavaStatus();
@@ -68,6 +82,7 @@ protected:
     afx_msg void OnPathChanged(UINT id);
     afx_msg void OnPersistent();
     afx_msg void OnDiscs();
+    afx_msg void OnShowWindow(BOOL show, UINT status);
     DECLARE_MESSAGE_MAP()
 };
 

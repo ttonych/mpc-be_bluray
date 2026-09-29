@@ -1968,13 +1968,25 @@
 #define IDS_PT_SEARCH_FOLDER 44402
 #define IDS_PT_INI_FILTER 44403
 
+#define IDD_BD_JAVA_PICKER 10132
+#define IDC_BD_JAVA_LABEL 22111
+#define IDC_BD_JAVA_VERSION 22112
+#define IDC_BD_JAVA_FIND 22113
+#define IDS_BD_JAVA_DETECTED 44404
+#define IDS_BD_JAVA_USING 44405
+#define IDS_BD_JAVA_VERSION 44406
+#define IDS_BD_JAVA_UNKNOWN 44407
+#define IDS_BD_JAVA_RESTART 44408
+// Seven consecutive errors in BlurayJava::Error order, starting at NotFound.
+#define IDS_BD_JAVA_ERROR 44409
+
 // Next default values for new objects
 //
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        44404
+#define _APS_NEXT_RESOURCE_VALUE        44416
 #define _APS_NEXT_COMMAND_VALUE         1204
-#define _APS_NEXT_CONTROL_VALUE         22111
+#define _APS_NEXT_CONTROL_VALUE         22114
 #define _APS_NEXT_SYMED_VALUE           24044
 #endif
 #endif

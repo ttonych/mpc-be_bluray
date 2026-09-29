@@ -433,14 +433,16 @@ STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX "Java для меню BD-J",IDC_STATIC,4,4,266,58
-    LTEXT "Java (x64):",IDC_STATIC,11,21,47,10
-    COMBOBOX IDC_BD_JAVA_HOME,61,18,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON "Обзор...",IDC_BD_BROWSE_JAVA,214,17,49,16
-    LTEXT "",IDC_BD_JAVA_STATUS,11,38,252,20
-    GROUPBOX "Запоминание настроек и места остановки",IDC_STATIC,4,69,266,63
-    CONTROL "Сохранять настройки и прогресс дисков",IDC_BD_PERSISTENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,83,252,11
-    LTEXT "Если это предусмотрено меню диска.",IDC_STATIC,22,97,240,10
+    GROUPBOX "Java для меню BD-J",IDC_STATIC,4,4,266,64
+    LTEXT "Найдена:",IDC_BD_JAVA_LABEL,11,17,60,10
+    LTEXT "",IDC_BD_JAVA_VERSION,74,17,189,10,SS_ENDELLIPSIS
+    LTEXT "Папка:",IDC_STATIC,11,34,30,10
+    EDITTEXT IDC_BD_JAVA_HOME,44,31,164,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON "Изменить...",IDC_BD_BROWSE_JAVA,214,30,49,16
+    LTEXT "",IDC_BD_JAVA_STATUS,11,49,252,18
+    GROUPBOX "Запоминание настроек и места остановки",IDC_STATIC,4,73,266,59
+    CONTROL "Сохранять настройки и прогресс дисков",IDC_BD_PERSISTENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,87,252,11
+    LTEXT "Если это предусмотрено меню диска.",IDC_STATIC,22,99,240,10
     PUSHBUTTON "Список дисков...",IDC_BD_DISCS,11,111,110,16
     GROUPBOX "Расположение файлов",IDC_STATIC,4,139,266,70
     LTEXT "Сохранения:",IDC_STATIC,11,155,48,10
@@ -450,6 +452,35 @@ BEGIN
     COMBOBOX IDC_BD_CACHE_ROOT,61,174,147,70,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON "Обзор...",IDC_BD_BROWSE_CACHE,214,173,49,16
     LTEXT "При смене папки файлы не переносятся.",IDC_STATIC,11,194,252,10
+END
+
+STRINGTABLE
+BEGIN
+    IDS_BD_JAVA_DETECTED "Найдена:"
+    IDS_BD_JAVA_USING "Используется:"
+    IDS_BD_JAVA_VERSION "%s %s · %u бит"
+    IDS_BD_JAVA_UNKNOWN "Не найдена"
+    IDS_BD_JAVA_RESTART "Выбрана другая Java. Примените настройки и перезапустите плеер."
+    44409 "Java 21 (64 бита) не найдена. Нажмите «Изменить…», чтобы выбрать папку."
+    44410 "Укажите полный путь к папке Java 21."
+    44411 "Файл jvm.dll повреждён или не является библиотекой Java."
+    44412 "Нужна Java для Windows x64. Выберите 64-разрядную версию для Intel/AMD."
+    44413 "Не удалось определить версию Java. Выберите полную Java 21."
+    44414 "Нужна Java 21. Эта версия Java не поддерживается."
+    44415 "Нет графических компонентов AWT. Выберите полную Java 21."
+END
+
+IDD_BD_JAVA_PICKER DIALOGEX 0, 0, 300, 83
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Java для меню BD-J"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "Выберите папку Java 21 (64 бита).",IDC_STATIC,7,9,286,10
+    EDITTEXT IDC_BD_JAVA_HOME,7,24,232,14,ES_AUTOHSCROLL
+    PUSHBUTTON "Обзор...",IDC_BD_BROWSE_JAVA,245,23,48,16
+    PUSHBUTTON "Найти Java",IDC_BD_JAVA_FIND,7,60,68,16
+    DEFPUSHBUTTON "ОК",IDOK,187,60,50,16
+    PUSHBUTTON "Отмена",IDCANCEL,243,60,50,16
 END
 
 IDD_BD_DISCS DIALOGEX 0, 0, 462, 275

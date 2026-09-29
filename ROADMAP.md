@@ -79,10 +79,20 @@ on Grand Prix. The tested ZIP was published without rebuilding.
   graphics; verify the affected discs with madVR and user confirmation.
 - [x] Add shared Java 21 x64 selection and show the found or running runtime;
   preserve explicit settings whose translated labels match the default.
-- [ ] Merge the reviewed source and complete the manual cloud build.
-- [ ] Check the exact cloud ZIP: HDMV, BD-J, Java selection, RU/EN and a fresh
+- [x] Merge the reviewed source and complete the manual cloud build.
+- [x] Check the exact cloud ZIP: HDMV, BD-J, Java selection, RU/EN and a fresh
   portable profile. Earlier local tests are not a substitute for this check.
-- [ ] Prepare a draft with bilingual notes and publish the same verified ZIP.
+- [x] Prepare a draft with bilingual notes, the verified ZIP and its checksum.
+- [ ] Publish that same ZIP as the second prerelease.
+
+The [cloud candidate from run 36602524325](https://github.com/ttonych/mpc-be_bluray/actions/runs/36602524325)
+passed compilation, component tests, package checks and bounded playback/UI
+validation on 2026-09-29. Streets of Fire covered HDMV HDR graphics and navigation;
+Baby Boom covered direct ISO startup, film/menu transitions and mount lifetime;
+Casino Royale (2006) covered BD-J startup, film and menu recall with Java 21.
+RU/EN first-run and Java controls passed; the source registry remained unchanged.
+The draft is ready; publication is still pending. Exact build identity, checksum
+and limits are recorded in the [development guide](docs/en/DEVELOPMENT.md#second-prerelease-candidate).
 
 The published first-release ZIP remains unchanged. Detailed changes are in the
 [changelog](docs/en/CHANGELOG.md#191-bluray2).
@@ -92,14 +102,16 @@ The published first-release ZIP remains unchanged. Detailed changes are in the
   corrected in that change belongs to a disabled hook and was not the cause
   of the observed crashes. A later investigation identified a native multi-file
   read buffer overrun; guarded reads and repeated BD-J startup/menu/film checks
-  passed after its separate correction. Cloud-ZIP qualification remains pending.
+  passed after its separate correction. The cloud ZIP passed the bounded
+  qualification above; the original crash disc was not repeated in that run.
 - Fixed Blu-ray ISO images being unmounted between playlists. Local checks with
   Baby Boom and madVR covered the introductory clips, menu, film start, return to
   the menu, the Open ISO dialog, and releasing the image on disc/player close.
   The tester also confirmed both introductory clips, the menu and film start
   after dragging the ISO onto the corrected player.
-  The published 1.9.1-bluray.1 ZIP does not contain this fix; a new cloud candidate
-  still needs to be built and checked before another release.
+  The published 1.9.1-bluray.1 ZIP does not contain this fix. The second cloud
+  candidate passed direct ISO opening, both introductory clips, menu, film,
+  top-menu return and release of the image when closing the disc.
 
 ## After initial feedback
 

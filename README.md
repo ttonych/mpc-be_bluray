@@ -11,7 +11,7 @@ Testing was performed with **madVR 210 x64**.
 
 This is an independent, experimental fork. Its current base is the official
 **MPC-BE 1.9.1 release**, with **libbluray 1.5.0** and maintained local patches.
-Fork version: **1.9.1-bluray.1**.
+Source version: **1.9.1-bluray.2**.
 
 This fork’s modifications were developed with the help of ChatGPT Astra.
 The project maintainer defines the functionality and interface requirements
@@ -19,8 +19,8 @@ and tests the player with real Blu-ray discs.
 
 ## Download and quick start
 
-Download [1.9.1-bluray.1 — Windows x64 ZIP](https://github.com/ttonych/mpc-be_bluray/releases/download/1.9.1-bluray.1/mpc-be_bluray-1.9.1-bluray.1-x64.zip).
-This is a preliminary release; see its [validation notes](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.1).
+Download the Windows x64 ZIP from [Releases](https://github.com/ttonych/mpc-be_bluray/releases).
+Published builds are prereleases; each release includes its own validation notes.
 The portable package includes English and Russian interfaces. Java and madVR
 are installed separately.
 Open `Readme.html` or `Readme.ru.html` in the extracted ZIP for offline instructions.

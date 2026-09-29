@@ -57,10 +57,14 @@ void FillValue(CComboBox& combo, int field, BlurayAdvanced::Value value) {
         const auto& choice = choices[i];
         const int item = combo.AddString(choice.first);
         combo.SetItemData(item, i);
-        if (value.enabled == choice.second.enabled && (!value.enabled || value.number == choice.second.number)) selected = item;
+        if (value.enabled == choice.second.enabled && (!value.enabled || value.number == choice.second.number)) selected = int(i);
     }
     // Translations may give an explicit preset and the default identical labels.
-    if (selected >= 0) combo.SetCurSel(selected); else combo.SetWindowTextW(DisplayValue(field, value));
+    if (selected >= 0) {
+        for (int item = 0; item < combo.GetCount(); ++item) {
+            if (combo.GetItemData(item) == DWORD_PTR(selected)) { combo.SetCurSel(item); break; }
+        }
+    } else combo.SetWindowTextW(DisplayValue(field, value));
     combo.LimitText(160);
 }
 bool ReadValue(CComboBox& combo, int field, BlurayAdvanced::Value& value) {

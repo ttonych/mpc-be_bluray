@@ -24,7 +24,7 @@ The current base is upstream **1.9.1**, commit
 `d2c7b28a22ffe5ddd72632c9076d594ac6d2178f`. The first fork version is
 `1.9.1-bluray.1`; another release on that base becomes `1.9.1-bluray.2`, and a
 release on a new base starts at, for example, `1.9.2-bluray.1`.
-The current source targets `1.9.1-bluray.2` in the title, About dialog and EXE
+The current source uses `1.9.1-bluray.2` in the title, About dialog and EXE
 product version. The published first-release ZIP retains its original version.
 `include/BlurayVersion.h` and `bluray/versions.json` must agree; the build and
 packager check this. Numeric upstream file versions are retained for resource-DLL
@@ -35,7 +35,7 @@ has been replaced by the official release; the fork version has no `dev` suffix.
 
 Use `main` for reviewed, tested code, with short `feature/`, `fix/` and `update/`
 branches. A permanent develop branch is not needed. The source repository is
-public; [1.9.1-bluray.1](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.1) is available as a prerelease.
+public; [1.9.1-bluray.2](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.2) is available as a prerelease.
 
 ## Branches and release flow
 
@@ -180,7 +180,7 @@ Actions candidate was not published; its playback was not validated.
 Its SHA-256 is `a67afb8c037f21b8d10abb2be9576f990c83872aea3389ff90f4de586cf42e2b`.
 The published build and its validation are recorded below.
 
-## Published prerelease
+## First published prerelease
 
 [Build 35619821494](https://github.com/ttonych/mpc-be_bluray/actions/runs/35619821494)
 completed on 2026-09-21 for commit
@@ -208,15 +208,19 @@ The previous candidate from run 35607517684 passed A Knight’s Tale and Baby Bo
 user checks but lacked the Grand Prix fixes and was not published.
 This documentation update does not rebuild or replace the release ZIP.
 
-## Second prerelease candidate
+## Second prerelease
 
 [Build 36602524325](https://github.com/ttonych/mpc-be_bluray/actions/runs/36602524325)
 completed on 2026-09-29 for commit
 `06f315fc2d9056a175b859984773dccb59745bfd`, version `1.9.1-bluray.2`.
 Local and cloud component tests, x64/Russian builds and publication checks passed.
 The exact 45-file ZIP passed its checksum, manifest, clean-profile, license,
-patch-provenance and offline-link checks. It is attached to an unpublished draft
-with bilingual notes. These validation notes do not change its build commit or files.
+patch-provenance and offline-link checks. It was published on 2026-09-29 as
+[prerelease 1.9.1-bluray.2](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.2)
+with bilingual notes, without rebuilding or replacing the validated ZIP.
+Both public assets were downloaded without authentication and their hashes
+verified; the source tag resolves to the build commit. These documentation
+updates do not change the release files.
 
 SHA-256: `8e0c4cc0c3398039e1c9b179a5ed32b53a1180d939bec245e063f1be3328e5ff`.
 

@@ -3,7 +3,7 @@
 [Русский](ROADMAP.ru.md) · [Overview](README.md) · [Changelog](docs/en/CHANGELOG.md)
 
 The project adapts Blu-ray menus in MPC-BE for use with the **madVR video renderer**.
-The first Windows x64 portable [prerelease is available](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.1)
+The second Windows x64 portable [prerelease is available](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.2)
 for testing alongside an existing MPC-BE. Priorities may change with feedback;
 items below are not promised release dates or compatibility guarantees.
 
@@ -73,7 +73,7 @@ published Release. The tester confirmed menus, film start and menu recall on
 A Knight’s Tale and Baby Boom, plus separate music, pause/resume and film start
 on Grand Prix. The tested ZIP was published without rebuilding.
 
-## Preparing 1.9.1-bluray.2
+## 1.9.1-bluray.2 release checks
 
 - [x] Implement local fixes for multi-file read corruption and faded HDMV HDR
   graphics; verify the affected discs with madVR and user confirmation.
@@ -83,7 +83,7 @@ on Grand Prix. The tested ZIP was published without rebuilding.
 - [x] Check the exact cloud ZIP: HDMV, BD-J, Java selection, RU/EN and a fresh
   portable profile. Earlier local tests are not a substitute for this check.
 - [x] Prepare a draft with bilingual notes, the verified ZIP and its checksum.
-- [ ] Publish that same ZIP as the second prerelease.
+- [x] Publish that same ZIP as the second prerelease.
 
 The [cloud candidate from run 36602524325](https://github.com/ttonych/mpc-be_bluray/actions/runs/36602524325)
 passed compilation, component tests, package checks and bounded playback/UI
@@ -91,8 +91,9 @@ validation on 2026-09-29. Streets of Fire covered HDMV HDR graphics and navigati
 Baby Boom covered direct ISO startup, film/menu transitions and mount lifetime;
 Casino Royale (2006) covered BD-J startup, film and menu recall with Java 21.
 RU/EN first-run and Java controls passed; the source registry remained unchanged.
-The draft is ready; publication is still pending. Exact build identity, checksum
-and limits are recorded in the [development guide](docs/en/DEVELOPMENT.md#second-prerelease-candidate).
+The same ZIP was published on 2026-09-29 as prerelease `1.9.1-bluray.2`.
+Public downloads, asset hashes and the source tag were verified. Exact build
+identity, checksum and limits are recorded in the [development guide](docs/en/DEVELOPMENT.md#second-prerelease).
 
 The published first-release ZIP remains unchanged. Detailed changes are in the
 [changelog](docs/en/CHANGELOG.md#191-bluray2).

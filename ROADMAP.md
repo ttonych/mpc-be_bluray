@@ -11,7 +11,7 @@ items below are not promised release dates or compatibility guarantees.
 
 - [x] Port the integration to the official MPC-BE 1.9.1 release base.
 - [x] Build MPC-BE, Russian resources, libbluray 1.5.0 and its two JARs locally,
-  with both maintained patches applied.
+  with the maintained patches applied.
 - [x] Run component, local-patch and publication-checker tests.
 - [x] Check HDMV with Baby Boom and BD-J with Ford v Ferrari on the local 1.9.1 build.
 - [x] Prepare the isolated portable profile and optional existing-settings import.
@@ -73,14 +73,26 @@ published Release. The tester confirmed menus, film start and menu recall on
 A Knight’s Tale and Baby Boom, plus separate music, pause/resume and film start
 on Grand Prix. The tested ZIP was published without rebuilding.
 
-## Changes awaiting the next release
+## Preparing 1.9.1-bluray.2
 
-- Fixed lost playmarks during BD-J menu returns and narrowed an unsafe Windows
-  process-state write. Local builds and regression tests passed. On the tested
-  UHD disc with madVR and Java 21, the user confirmed no further menu problems
-  or crashes; the log confirms five returns with restored graphics and a normal
-  close. Broader disc/stability checks remain part of the next release validation.
-  These changes are not in the published ZIP.
+- [x] Implement local fixes for multi-file read corruption and faded HDMV HDR
+  graphics; verify the affected discs with madVR and user confirmation.
+- [x] Add shared Java 21 x64 selection and show the found or running runtime;
+  preserve explicit settings whose translated labels match the default.
+- [ ] Merge the reviewed source and complete the manual cloud build.
+- [ ] Check the exact cloud ZIP: HDMV, BD-J, Java selection, RU/EN and a fresh
+  portable profile. Earlier local tests are not a substitute for this check.
+- [ ] Prepare a draft with bilingual notes and publish the same verified ZIP.
+
+The published first-release ZIP remains unchanged. Detailed changes are in the
+[changelog](docs/en/CHANGELOG.md#191-bluray2).
+
+- Fixed lost playmarks during BD-J menu returns; local tests and five menu
+  returns with restored graphics passed. The unsafe process-state write also
+  corrected in that change belongs to a disabled hook and was not the cause
+  of the observed crashes. A later investigation identified a native multi-file
+  read buffer overrun; guarded reads and repeated BD-J startup/menu/film checks
+  passed after its separate correction. Cloud-ZIP qualification remains pending.
 - Fixed Blu-ray ISO images being unmounted between playlists. Local checks with
   Baby Boom and madVR covered the introductory clips, menu, film start, return to
   the menu, the Open ISO dialog, and releasing the image on disc/player close.

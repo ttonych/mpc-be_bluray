@@ -5,7 +5,14 @@
 This file covers this fork. The original MPC-BE history remains in
 [Changelog.txt](../Changelog.txt).
 
-## Unreleased
+## 1.9.1-bluray.2
+
+Base: official MPC-BE 1.9.1; libbluray 1.5.0 with local `mouse-page-v1`,
+`playmark-seek-v1` and `bdj-toggle-v1` patches. See the release notes for
+publication status and validation of the cloud-built ZIP.
+
+- Preserved explicitly selected Blu-ray settings when their translated label
+  matches the default, including the Russian unlimited viewer-age preset.
 
 - Corrected faded HDMV menu graphics on HDR Blu-ray discs. Indexed menu colours
   now use the associated video's BT.2020/PQ conversion for the madVR bitmap OSD,

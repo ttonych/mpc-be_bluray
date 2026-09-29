@@ -24,7 +24,8 @@ The current base is upstream **1.9.1**, commit
 `d2c7b28a22ffe5ddd72632c9076d594ac6d2178f`. The first fork version is
 `1.9.1-bluray.1`; another release on that base becomes `1.9.1-bluray.2`, and a
 release on a new base starts at, for example, `1.9.2-bluray.1`.
-The title, About dialog and EXE product version show `1.9.1-bluray.1`.
+The current source targets `1.9.1-bluray.2` in the title, About dialog and EXE
+product version. The published first-release ZIP retains its original version.
 `include/BlurayVersion.h` and `bluray/versions.json` must agree; the build and
 packager check this. Numeric upstream file versions are retained for resource-DLL
 compatibility. Update checks read this fork's published releases, including prereleases.

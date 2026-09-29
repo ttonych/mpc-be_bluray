@@ -51,18 +51,29 @@ CStringW DisplayValue(int field, BlurayAdvanced::Value value) {
 }
 void FillValue(CComboBox& combo, int field, BlurayAdvanced::Value value) {
     combo.ResetContent();
-    for (const auto& choice : ValueChoices(field)) combo.AddString(choice.first);
-    const CStringW text = DisplayValue(field, value);
-    const int index = combo.FindStringExact(-1, text);
-    if (index >= 0) combo.SetCurSel(index); else combo.SetWindowTextW(text);
+    const auto choices = ValueChoices(field);
+    int selected = -1;
+    for (size_t i = 0; i < choices.size(); ++i) {
+        const auto& choice = choices[i];
+        const int item = combo.AddString(choice.first);
+        combo.SetItemData(item, i);
+        if (value.enabled == choice.second.enabled && (!value.enabled || value.number == choice.second.number)) selected = item;
+    }
+    // Translations may give an explicit preset and the default identical labels.
+    if (selected >= 0) combo.SetCurSel(selected); else combo.SetWindowTextW(DisplayValue(field, value));
     combo.LimitText(160);
 }
 bool ReadValue(CComboBox& combo, int field, BlurayAdvanced::Value& value) {
+    const auto choices = ValueChoices(field);
+    const int selected = combo.GetCurSel();
+    if (selected >= 0) {
+        const auto choice = combo.GetItemData(selected);
+        if (choice < choices.size()) { value = choices[choice].second; return true; }
+    }
     CStringW text;
-    if (combo.GetCurSel() >= 0) combo.GetLBText(combo.GetCurSel(), text);
-    else combo.GetWindowTextW(text);
+    combo.GetWindowTextW(text);
     text.Trim();
-    for (const auto& choice : ValueChoices(field)) if (text == choice.first) { value = choice.second; return true; }
+    for (const auto& choice : choices) if (text == choice.first) { value = choice.second; return true; }
     uint32_t number;
     if (!BlurayAdvanced::Parse(text.GetString(), number) || !BlurayAdvanced::Valid(field, number)) {
         AfxMessageBox(ResStr(IDS_BD_BAD_NUMBER), MB_ICONEXCLAMATION); combo.SetFocus(); return false;

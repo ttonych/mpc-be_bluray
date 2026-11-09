@@ -157,10 +157,11 @@ class CFGFilterVideoRenderer : public CFGFilter
 {
 protected:
 	HWND m_hWnd;
+	CComPtr<IUnknown> m_blurayPresenter;
 	bool m_bIsPreview = {};
 
 public:
-	CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CStringW name = L"", UINT64 merit = MERIT64_DO_USE, bool bIsPreview = false);
+	CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CStringW name = L"", UINT64 merit = MERIT64_DO_USE, bool bIsPreview = false, IUnknown* blurayPresenter = nullptr);
 
 	HRESULT Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, &IID_IUnknown>>& pUnks) override;
 

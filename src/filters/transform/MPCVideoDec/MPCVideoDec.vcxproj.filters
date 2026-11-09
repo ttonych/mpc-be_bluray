@@ -137,6 +137,9 @@
     <ClInclude Include="D3D11Decoder\D3D11Decoder.h">
       <Filter>D3D11Decoder</Filter>
     </ClInclude>
+    <ClInclude Include="D3D11Decoder\D3D11DeviceSession.h">
+      <Filter>D3D11Decoder</Filter>
+    </ClInclude>
     <ClInclude Include="DxgiUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>

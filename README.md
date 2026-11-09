@@ -11,7 +11,7 @@ Testing was performed with **madVR 210 x64**.
 
 This is an independent, experimental fork. Its current base is the official
 **MPC-BE 1.9.1 release**, with **libbluray 1.5.0** and maintained local patches.
-Source version: **1.9.1-bluray.2**.
+Source version: **1.9.1-bluray.3**.
 
 This fork’s modifications were developed with the help of ChatGPT Astra.
 The project maintainer defines the functionality and interface requirements

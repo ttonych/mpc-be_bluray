@@ -420,9 +420,10 @@ HRESULT CFGFilterFile::Create(IBaseFilter** ppBF, std::list<CComQIPtr<IUnknown, 
 // CFGFilterVideoRenderer
 //
 
-CFGFilterVideoRenderer::CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CStringW name, UINT64 merit, bool bIsPreview)
+CFGFilterVideoRenderer::CFGFilterVideoRenderer(HWND hWnd, const CLSID& clsid, CStringW name, UINT64 merit, bool bIsPreview, IUnknown* blurayPresenter)
 	: CFGFilter(clsid, name, merit)
 	, m_hWnd(hWnd)
+	, m_blurayPresenter(blurayPresenter)
 	, m_bIsPreview(bIsPreview)
 {
 	AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
@@ -432,6 +433,23 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, std::list<CComQIPtr<I
 {
 	DLog(L"CFGFilterVideoRenderer::Create() on thread: %d", GetCurrentThreadId());
 	CheckPointer(ppBF, E_POINTER);
+
+	if (m_blurayPresenter) {
+		// Only the filter is carried over. DirectShow must have removed it
+		// from the old graph before the new decoder negotiates its pins.
+		CComQIPtr<IBaseFilter> filter = m_blurayPresenter.p;
+		CFilterInfo info;
+		if (!filter || FAILED(filter->QueryFilterInfo(&info)) || info.pGraph) {
+			return VFW_E_WRONG_STATE;
+		}
+		if (CComQIPtr<IVideoWindow> window = filter.p) {
+			const HRESULT hr = window->put_Owner((OAHWND)m_hWnd);
+			if (FAILED(hr)) return hr;
+		}
+		pUnks.emplace_back(m_blurayPresenter.p);
+		*ppBF = filter.Detach();
+		return S_OK;
+	}
 
 	auto pMainFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 	const bool bFullscreen = pMainFrame && pMainFrame->IsD3DFullScreenMode();

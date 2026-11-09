@@ -20,6 +20,8 @@
 
 #pragma once
 
+class CD3D11DeviceSession;
+
 class OpenMediaData
 {
 public:
@@ -37,6 +39,9 @@ public:
 	//OpenFileData() {}
 	CFileItem fi;
 	CAudioItemList auds;
+	CComPtr<IUnknown> blurayPresenter;
+	std::shared_ptr<CD3D11DeviceSession> blurayDevice;
+	HWND blurayVideoWindow = nullptr;
 	REFERENCE_TIME rtStart = INVALID_TIME;
 
 	void Clear() {
@@ -45,6 +50,9 @@ public:
 		bAddRecent = TRUE;
 		fi.Clear();
 		auds.clear();
+		blurayPresenter.Release();
+		blurayDevice.reset();
+		blurayVideoWindow = nullptr;
 		rtStart = INVALID_TIME;
 	}
 };

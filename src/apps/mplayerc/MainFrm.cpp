@@ -4584,8 +4584,15 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 {
 	ASSERT(m_eMediaLoadState == MLS_LOADING);
 	SetLoadState(MLS_LOADED);
+	bool reused = false;
+	if (auto* file = dynamic_cast<OpenFileData*>(pOMD.get()); file && file->blurayPresenter) {
+		reused = m_pCAP && file->blurayPresenter.IsEqualObject(m_pCAP);
+		// m_lastOMD outlives the graph; never store its renderer there.
+		file->blurayPresenter.Release();
+		file->blurayVideoWindow = nullptr;
+	}
 	if (m_blurayMenu) {
-		m_blurayMenu->AttachRenderer(m_pCAP);
+		m_blurayMenu->AttachRenderer(m_pCAP, reused);
 		REFERENCE_TIME position = 0;
 		if (m_pMS) m_pMS->GetCurrentPosition(&position);
 		SetBlurayPlaybackPosition(position);
@@ -12290,7 +12297,15 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 		m_bCustomGraph = m_bShockwaveGraph;
 
 		if (!m_bCustomGraph) {
-			auto pFGManager = DNew CFGManagerPlayer(L"CFGManagerPlayer", nullptr, m_pVideoWnd->m_hWnd);
+			if (pFileData->blurayVideoWindow != m_pVideoWnd->m_hWnd
+					|| s.m_VRSettings.iVideoRenderer != VIDRNDT_MADVR) {
+				pFileData->blurayPresenter.Release();
+			}
+			if (s.m_VRSettings.iVideoRenderer != VIDRNDT_MADVR) {
+				pFileData->blurayDevice.reset();
+			}
+			auto pFGManager = DNew CFGManagerPlayer(L"CFGManagerPlayer", nullptr, m_pVideoWnd->m_hWnd,
+				0, pFileData->blurayPresenter, pFileData->blurayDevice);
 			m_pGB = pFGManager;
 
 			if (m_pGB) {
@@ -14885,6 +14900,9 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMVRC.Release();
 	m_pMVRI.Release();
 	m_pMVRFG.Release();
+	if (m_bluraySwitching && m_clsidCAP == CLSID_madVRAllocatorPresenter && m_pCAP) {
+		m_pCAP->SetSubPicProvider(nullptr);
+	}
 	m_pCAP.Release();
 	m_clsidCAP = GUID_NULL;
 	m_pVMRWC.Release();
@@ -14933,6 +14951,10 @@ void CMainFrame::CloseMediaPrivate()
 	if (m_pGB) {
 		m_pGB->RemoveFromROT();
 		m_pGB.Release();
+	}
+	// The native device must outlive teardown of the renderer on final close.
+	if (auto* file = dynamic_cast<OpenFileData*>(m_lastOMD.get())) {
+		file->blurayDevice.reset();
 	}
 
 	PreviewWindowHide();
@@ -19846,6 +19868,11 @@ void CMainFrame::TickBlurayMenu()
 		data->fi = path;
 		data->rtStart = start;
 		data->bAddRecent = FALSE;
+		data->blurayDevice = m_blurayMenu->nativeDevice;
+		if (m_clsidCAP == CLSID_madVRAllocatorPresenter && m_pCAP && m_pVideoWnd) {
+			data->blurayPresenter = m_pCAP;
+			data->blurayVideoWindow = m_pVideoWnd->m_hWnd;
+		}
 		m_bluraySwitching = true;
 		OpenMedia(std::move(data));
 		m_bluraySwitching = false;

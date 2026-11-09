@@ -26,6 +26,8 @@
 
 #define LowMerit(x) (x L" (low merit)")
 
+class CD3D11DeviceSession;
+
 class CFGManager
 	: public CUnknown
 	, public IGraphBuilder2
@@ -155,7 +157,7 @@ public:
 	STDMETHODIMP AddFilter(IBaseFilter* pFilter, LPCWSTR pName) override;
 
 public:
-	CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd = 0, bool IsPreview = false);
+	CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd = 0, bool IsPreview = false, std::shared_ptr<CD3D11DeviceSession> device = nullptr);
 };
 
 class CFGManagerPlayer : public CFGManagerCustom
@@ -166,7 +168,7 @@ protected:
 	STDMETHODIMP ConnectDirect(IPin* pPinOut, IPin* pPinIn, const AM_MEDIA_TYPE* pmt) override;
 
 public:
-	CFGManagerPlayer(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, int preview = 0);
+	CFGManagerPlayer(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, int preview = 0, IUnknown* blurayPresenter = nullptr, std::shared_ptr<CD3D11DeviceSession> device = nullptr);
 
 	void SetUserAgent(CStringW useragent) { m_userAgent = useragent; };
 	void SetReferrer(CStringW referrer) { m_referrer = referrer; };

@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11Decoder\D3D11Decoder.h" />
+    <ClInclude Include="D3D11Decoder\D3D11DeviceSession.h" />
     <ClInclude Include="D3D11Decoder\D3D11SurfaceAllocator.h" />
     <ClInclude Include="D3D11Decoder\ID3DVideoMemoryConfiguration.h" />
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h" />

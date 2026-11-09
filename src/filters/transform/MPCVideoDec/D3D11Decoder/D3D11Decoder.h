@@ -25,6 +25,7 @@
 #include <dxgi.h>
 #include "./D3D11Decoder/D3D11SurfaceAllocator.h"
 
+class CD3D11DeviceSession;
 class CMPCVideoDecFilter;
 struct AVCodecContext;
 struct AVD3D11VAContext;
@@ -33,7 +34,7 @@ struct AVBufferRef;
 class CD3D11Decoder
 {
 public:
-	CD3D11Decoder(CMPCVideoDecFilter* pFilter);
+	CD3D11Decoder(CMPCVideoDecFilter* pFilter, std::shared_ptr<CD3D11DeviceSession> session);
 	virtual ~CD3D11Decoder();
 
 	HRESULT Init();
@@ -62,6 +63,8 @@ private:
 
 	CD3D11SurfaceAllocator* m_pAllocator = nullptr;
 
+	std::shared_ptr<CD3D11DeviceSession> m_session;
+	HRESULT OpenDevice(UINT adapter);
 	AVBufferRef* m_pDevCtx = nullptr;
 	AVBufferRef* m_pFramesCtx = nullptr;
 

@@ -5,6 +5,17 @@
 This file covers this fork. The original MPC-BE history remains in
 [Changelog.txt](../Changelog.txt).
 
+## 1.9.1-bluray.3
+
+- Fixed a madVR crash when a Blu-ray menu switched playlists with the internal
+  decoder in D3D11 native mode. MPC-BE keeps the renderer when the next
+  playlist opens in the same video window.
+- In D3D11 native mode, keep the internal decoder’s device, immediate context
+  and synchronization mutex alive across playlist changes on the same adapter.
+  Each playlist negotiates its own codec, output format and decoding surfaces.
+- Verified chapter marks on the feature timeline and documented how to restore
+  them in an existing profile. The fresh portable profile enables them by default.
+
 ## 1.9.1-bluray.2
 
 Base: official MPC-BE 1.9.1; libbluray 1.5.0 with local `mouse-page-v1`,

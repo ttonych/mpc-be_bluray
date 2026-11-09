@@ -4,11 +4,14 @@
 // Experimental Blu-ray playlist bridge. Public methods run on the UI thread;
 // asynchronous Java graphics are copied through a protected frame buffer.
 // Video/audio decoding stays in MPC-BE's existing DirectShow graph.
+class CD3D11DeviceSession;
+
 class CBlurayMenu
 {
     struct State;
     std::unique_ptr<State> m;
 public:
+    const std::shared_ptr<CD3D11DeviceSession> nativeDevice;
     CBlurayMenu();
     ~CBlurayMenu();
     bool Start(const CStringW& root, CStringW& error);
@@ -16,7 +19,7 @@ public:
     CStringW StorageKey() const;
     CStringW StoragePath() const;
     static CStringW DataDirectory();
-    bool AttachRenderer(IUnknown* renderer);
+    bool AttachRenderer(IUnknown* renderer, bool reused = false);
     void DetachRenderer();
     bool RendererBusy() const;
     REFERENCE_TIME Tick(REFERENCE_TIME position, bool running, double rate, long volume);

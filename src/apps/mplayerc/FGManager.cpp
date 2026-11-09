@@ -45,12 +45,14 @@
 
 class CFGMPCVideoDecoderInternal : public CFGFilterInternal<CMPCVideoDecFilter>
 {
+	std::shared_ptr<CD3D11DeviceSession> m_device;
 	bool	m_bIsPreview;
 	UINT64	m_merit;
 
 public:
-	CFGMPCVideoDecoderInternal(CStringW name = L"", UINT64 merit = MERIT64_DO_USE, bool IsPreview = false)
+	CFGMPCVideoDecoderInternal(CStringW name = L"", UINT64 merit = MERIT64_DO_USE, bool IsPreview = false, std::shared_ptr<CD3D11DeviceSession> device = nullptr)
 		: CFGFilterInternal<CMPCVideoDecFilter>(name, merit)
+		, m_device(std::move(device))
 		, m_bIsPreview(IsPreview)
 		, m_merit(merit) {
 
@@ -79,7 +81,7 @@ public:
 		CheckPointer(ppBF, E_POINTER);
 
 		HRESULT hr = S_OK;
-		CComPtr<CMPCVideoDecFilter> pBF = DNew CMPCVideoDecFilter(nullptr, &hr);
+		CComPtr<CMPCVideoDecFilter> pBF = DNew CMPCVideoDecFilter(nullptr, &hr, m_device);
 		if (FAILED(hr)) {
 			return hr;
 		}
@@ -1903,7 +1905,7 @@ STDMETHODIMP CFGManager::RenderAudioFile(LPCWSTR lpcwstrFileName)
 // CFGManagerCustom
 //
 
-CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
+CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview, std::shared_ptr<CD3D11DeviceSession> device)
 	: CFGManager(pName, pUnk, hWnd, IsPreview)
 {
 	CAppSettings& s = AfxGetAppSettings();
@@ -2633,12 +2635,12 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	}
 
 	// High merit MPC Video Decoder
-	pFGF = DNew CFGMPCVideoDecoderInternal(MPCVideoDecName, MERIT64_ABOVE_DSHOW + 1, IsPreview);
+	pFGF = DNew CFGMPCVideoDecoderInternal(MPCVideoDecName, MERIT64_ABOVE_DSHOW + 1, IsPreview, device);
 	m_transform.emplace_back(pFGF);
 
 	// Low merit MPC Video Decoder
 	if (!IsPreview) { // do not need for Preview mode.
-		pFGF = DNew CFGMPCVideoDecoderInternal(LowMerit(MPCVideoDecName));
+		pFGF = DNew CFGMPCVideoDecoderInternal(LowMerit(MPCVideoDecName), MERIT64_DO_USE, false, device);
 		m_transform.emplace_back(pFGF);
 	}
 
@@ -2878,8 +2880,8 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 // CFGManagerPlayer
 //
 
-CFGManagerPlayer::CFGManagerPlayer(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, int preview)
-	: CFGManagerCustom(pName, pUnk, hWnd, (preview > 0))
+CFGManagerPlayer::CFGManagerPlayer(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, int preview, IUnknown* blurayPresenter, std::shared_ptr<CD3D11DeviceSession> device)
+	: CFGManagerCustom(pName, pUnk, hWnd, (preview > 0), std::move(device))
 {
 	DLog(L"CFGManagerPlayer::CFGManagerPlayer() on thread: %u", GetCurrentThreadId());
 	CFGFilter* pFGF;
@@ -2904,7 +2906,8 @@ CFGManagerPlayer::CFGManagerPlayer(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, int
 				AfxMessageBox(msg_str, MB_ICONEXCLAMATION | MB_OK);
 				m_transform.emplace_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"Enhanced Video Renderer", vrmerit));
 			} else {
-				m_transform.emplace_back(DNew CFGFilterVideoRenderer(m_hWnd, clsidAP, name, vrmerit));
+				m_transform.emplace_back(DNew CFGFilterVideoRenderer(m_hWnd, clsidAP, name, vrmerit, false,
+					clsidAP == CLSID_madVRAllocatorPresenter ? blurayPresenter : nullptr));
 			}
 		};
 

@@ -116,6 +116,9 @@ The published first-release ZIP remains unchanged. Detailed changes are in the
 
 ## After initial feedback
 
+- Qualify the 1.9.1-bluray.3 cloud ZIP with madVR and D3D11 native on HDMV
+  and BD-J discs. Check intro-to-menu and film transitions, pop-up and top menus,
+  and chapter marks on the feature timeline with a fresh portable profile.
 - Prioritize reproducible menu, playback, data-isolation and crash regressions.
 - Maintain a compact compatibility record that names the tested player build,
   madVR/Java versions, disc edition and exact scenarios rather than declaring a

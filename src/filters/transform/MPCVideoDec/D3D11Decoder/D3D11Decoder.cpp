@@ -26,6 +26,7 @@
 #include "DSUtil/DSUtil.h"
 #include "DSUtil/DXVAState.h"
 #include "D3D11Decoder.h"
+#include "D3D11DeviceSession.h"
 #include "../MPCVideoDec.h"
 #include "../DxgiUtils.h"
 
@@ -45,8 +46,13 @@ extern "C"
 }
 #pragma warning(pop)
 
-CD3D11Decoder::CD3D11Decoder(CMPCVideoDecFilter* pFilter)
-  : m_pFilter(pFilter)
+CD3D11DeviceSession::~CD3D11DeviceSession()
+{
+	av_buffer_unref(&context);
+}
+
+CD3D11Decoder::CD3D11Decoder(CMPCVideoDecFilter* pFilter, std::shared_ptr<CD3D11DeviceSession> session)
+  : m_pFilter(pFilter), m_session(std::move(session))
 {
 }
 
@@ -569,6 +575,68 @@ void CD3D11Decoder::PostInitDecoder(AVCodecContext* c)
 	m_dwSurfaceHeight = dxva_align_dimensions(c->codec_id, c->coded_height);
 }
 
+HRESULT CD3D11Decoder::OpenDevice(UINT nDevice)
+{
+	std::unique_lock<std::mutex> lock;
+	if (m_session) {
+		lock = std::unique_lock<std::mutex>(m_session->mutex);
+	}
+	if (m_session && m_session->context) {
+		CComPtr<IDXGIAdapter> adapter;
+		DXGI_ADAPTER_DESC desc = {};
+		auto* factory = CDXGIFactory1::GetInstance().GetFactory();
+		auto* cached = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_session->context->data)->hwctx;
+		if (factory && SUCCEEDED(factory->EnumAdapters(nDevice, &adapter)) && SUCCEEDED(adapter->GetDesc(&desc))
+				&& desc.AdapterLuid.HighPart == m_session->adapter.AdapterLuid.HighPart
+				&& desc.AdapterLuid.LowPart == m_session->adapter.AdapterLuid.LowPart
+				&& cached->device->GetDeviceRemovedReason() == S_OK) {
+			m_AdapterDesc = desc;
+			m_pDevCtx = av_buffer_ref(m_session->context);
+			return m_pDevCtx ? S_OK : E_OUTOFMEMORY;
+		}
+	}
+
+	// create the device
+	ID3D11Device* pD3D11Device = nullptr;
+	HRESULT hr = CreateD3D11Device(nDevice, &pD3D11Device, &m_AdapterDesc);
+	if (FAILED(hr)) {
+		return E_FAIL;
+	}
+
+	// allocate and fill device context
+	m_pDevCtx = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_D3D11VA);
+	if (!m_pDevCtx) {
+		pD3D11Device->Release();
+		return E_OUTOFMEMORY;
+	}
+	AVD3D11VADeviceContext* pDeviceContext = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_pDevCtx->data)->hwctx;
+	pDeviceContext->device = pD3D11Device;
+
+	// finalize the context
+	int ret = av_hwdevice_ctx_init(m_pDevCtx);
+	if (ret < 0) {
+		av_buffer_unref(&m_pDevCtx);
+		return E_FAIL;
+	}
+
+	// enable multithreaded protection
+	ID3D10Multithread* pMultithread = nullptr;
+	hr = pDeviceContext->device_context->QueryInterface(&pMultithread);
+	if (SUCCEEDED(hr)) {
+		pMultithread->SetMultithreadProtected(TRUE);
+		SAFE_RELEASE(pMultithread);
+	}
+
+	if (m_session) {
+		if (av_buffer_replace(&m_session->context, m_pDevCtx) < 0) {
+			return E_OUTOFMEMORY;
+		}
+		m_session->adapter = m_AdapterDesc;
+		++m_session->generation;
+	}
+	return S_OK;
+}
+
 HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 {
 	DLog(L"CD3D11Decoder::PostConnect()");
@@ -594,32 +662,12 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	// device id
 	UINT nDevice = pD3D11DecoderConfiguration->GetD3D11AdapterIndex();
 
-	// create the device
-	ID3D11Device* pD3D11Device = nullptr;
-	hr = CreateD3D11Device(nDevice, &pD3D11Device, &m_AdapterDesc);
+	hr = OpenDevice(nDevice);
 	if (FAILED(hr)) {
-		return E_FAIL;
+		return hr;
 	}
-
-	// allocate and fill device context
-	m_pDevCtx = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_D3D11VA);
-	AVD3D11VADeviceContext* pDeviceContext = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_pDevCtx->data)->hwctx;
-	pDeviceContext->device = pD3D11Device;
-
-	// finalize the context
-	int ret = av_hwdevice_ctx_init(m_pDevCtx);
-	if (ret < 0) {
-		av_buffer_unref(&m_pDevCtx);
-		return E_FAIL;
-	}
-
-	// enable multithreaded protection
-	ID3D10Multithread* pMultithread = nullptr;
-	hr = pDeviceContext->device_context->QueryInterface(&pMultithread);
-	if (SUCCEEDED(hr)) {
-		pMultithread->SetMultithreadProtected(TRUE);
-		SAFE_RELEASE(pMultithread);
-	}
+	auto* pDeviceContext = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_pDevCtx->data)->hwctx;
+	auto* pD3D11Device = pDeviceContext->device;
 
 	// check if the connection supports native mode
 	CMediaType& mt = m_pFilter->m_pOutput->CurrentMediaType();
@@ -676,6 +724,9 @@ HRESULT CD3D11Decoder::PostConnect(AVCodecContext* c, IPin* pPin)
 	// Notice the connected pin that we're sending D3D11 textures
 	hr = pD3D11DecoderConfiguration->ActivateD3D11Decoding(pDeviceContext->device, pDeviceContext->device_context, pDeviceContext->lock_ctx, 0);
 	DLogIf(FAILED(hr), L"CD3D11Decoder::PostConnect() : ID3D11DecoderConfiguration::ActivateD3D11Decoding() failed");
+	if (SUCCEEDED(hr) && m_session) {
+		++m_session->activations;
+	}
 
 	return hr;
 }

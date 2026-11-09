@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "stdafx.h"
 #include "BlurayMenu.h"
+#include "filters/transform/MPCVideoDec/D3D11Decoder/D3D11DeviceSession.h"
 #include "BlurayMenuCoordinates.h"
 #include "BlurayArgbBuffer.h"
 #include "BlurayMediaMonitor.h"
@@ -14,6 +15,7 @@
 #include "BlurayDiscStorage.h"
 #include "BlurayCatalog.h"
 #include "DSUtil/Profile.h"
+#include "DSUtil/DXVAState.h"
 #include <libbluray/bluray.h>
 #include <libbluray/overlay.h>
 #include <libbluray/keys.h>
@@ -64,6 +66,7 @@ struct CBlurayMenu::State
     unsigned playitem = 0, audioStream = 255, pgStream = 4095;
     bool pgEnabled = false, streamsDirty = false;
     int lastAudioPid = -2, lastSubtitlePid = -2;
+    bool logDecoder = false;
     MPLS_PL* audioPlaylist = nullptr;
     BlurayMenuAudioPlayer menuAudio;
     UINT stillSeconds = 0;
@@ -474,7 +477,7 @@ struct CBlurayMenu::State
     }
 };
 
-CBlurayMenu::CBlurayMenu() : m(std::make_unique<State>()) {}
+CBlurayMenu::CBlurayMenu() : m(std::make_unique<State>()), nativeDevice(std::make_shared<CD3D11DeviceSession>()) {}
 CBlurayMenu::~CBlurayMenu() = default;
 
 bool CBlurayMenu::Start(const CStringW& root, CStringW& error)
@@ -567,14 +570,15 @@ bool CBlurayMenu::Start(const CStringW& root, CStringW& error)
     return error.IsEmpty();
 }
 
-bool CBlurayMenu::AttachRenderer(IUnknown* renderer)
+bool CBlurayMenu::AttachRenderer(IUnknown* renderer, bool reused)
 {
     m->Detach();
     if (renderer) {
         renderer->QueryInterface(IID_PPV_ARGS(&m->osd));
         renderer->QueryInterface(IID_PPV_ARGS(&m->command));
     }
-    m->Log("madvr_attached", m->osd != nullptr);
+    m->Log("madvr_attached", m->osd != nullptr, reused);
+    m->logDecoder = m->log != nullptr;
     if (!m->osd) { m->error = ResStr(IDS_BD_RENDERER_UNSUPPORTED); return false; }
     m->waitingGraph = false;
     m->playerSeekAfter = 0;
@@ -591,6 +595,12 @@ bool CBlurayMenu::RendererBusy() const { return m->presenting; }
 REFERENCE_TIME CBlurayMenu::Tick(REFERENCE_TIME position, bool running, double rate, long volume)
 {
     if (m->media.LossReason() || m->readFailed) { m->menuAudio.Reset(); return position; }
+    if (m->logDecoder && !m->waitingGraph && running && position > 0) {
+        fprintf(m->log, "%llu video_decoder %u %ls\n", GetTickCount64() - m->started,
+            m->playlist, DXVAState::GetDescription());
+        m->Log("native_device", nativeDevice->Generation(), nativeDevice->Activations());
+        m->logDecoder = false;
+    }
     const HRESULT audioResult = m->menuAudio.Tick(volume);
     if (FAILED(audioResult)) StreamResult(true, -1, audioResult);
     if (m->title && !m->waitingGraph) {

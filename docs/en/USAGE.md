@@ -27,6 +27,11 @@ Open **View → Options → Playback → Blu-ray** and enable Blu-ray menus.
 Open the whole disc or `BDMV\index.bdmv`. To play just a playlist without menu
 navigation, open its `.mpls` file. Disc decryption tools are not included.
 
+Blu-ray menu playback uses the hardware mode selected in MPC Video Decoder.
+With D3D11 native, the decoder sends GPU textures directly to madVR during
+intros, menus and the feature. Successive playlists in the same disc session
+can share the same D3D11 device on the selected adapter.
+
 ## Java for BD-J
 
 HDMV menus work without Java. BD-J needs a full x64 Java runtime with AWT graphics
@@ -81,9 +86,14 @@ Previous goes to the current chapter's start; within its first three seconds,
 it goes to the previous chapter. Chapter commands are disabled in a visible menu.
 
 Mouse input depends on how the disc's menu was authored, particularly with BD-J.
-Try the keyboard when the menu does not handle mouse input. Chapter marks are
-hidden in menus/background loops and shown during the film. Chapter OSD follows
-MPC-BE's seek-time display setting; a BD-J menu can also draw its own chapter OSD.
+Try the keyboard when the menu does not handle mouse input.
+
+The fresh portable profile shows chapter marks on the seek bar during films
+with chapters. The player hides the marks in menus and background loops. If
+your existing or imported profile hides them during the film as well, enable
+**Use chapters marker** under **View → Options → Player → Interface**.
+The chapter OSD follows MPC-BE's seek-time display setting. A BD-J menu can
+also draw its own chapter OSD.
 
 ## Blu-ray settings
 

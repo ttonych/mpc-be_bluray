@@ -45,6 +45,7 @@ struct AVFrame;
 struct AVPacket;
 struct AVBufferRef;
 class CD3D11Decoder;
+class CD3D11DeviceSession;
 
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
@@ -247,7 +248,7 @@ private:
 	bool						CheckDXVACompatible(const enum AVCodecID codec, const enum AVPixelFormat pix_fmt, const int profile);
 
 public:
-	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
+	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr, std::shared_ptr<CD3D11DeviceSession> device = nullptr);
 	virtual ~CMPCVideoDecFilter();
 
 	DECLARE_IUNKNOWN

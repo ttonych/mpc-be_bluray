@@ -1070,7 +1070,7 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 
 // CMPCVideoDecFilter
 
-CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
+CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr, std::shared_ptr<CD3D11DeviceSession> device)
 	: CBaseVideoFilter(L"MPC - Video decoder", lpunk, phr, __uuidof(this))
 	, m_nDiscardMode(AVDISCARD_DEFAULT)
 	, m_nHwDecoder(SysVersion::IsWin8orLater() ? HWDec_D3D11 : HWDec_DXVA2)
@@ -1237,7 +1237,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	DetectVideoCard(hWnd);
 
 	if (SysVersion::IsWin8orLater() && m_nHwDecoder == HWDec_D3D11) {
-		m_pD3D11Decoder = std::make_unique<CD3D11Decoder>(this);
+		m_pD3D11Decoder = std::make_unique<CD3D11Decoder>(this, std::move(device));
 		if (FAILED(m_pD3D11Decoder->Init())) {
 			m_pD3D11Decoder.reset();
 		}

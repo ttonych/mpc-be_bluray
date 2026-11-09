@@ -3,7 +3,7 @@
 [Русский](ROADMAP.ru.md) · [Overview](README.md) · [Changelog](docs/en/CHANGELOG.md)
 
 The project adapts Blu-ray menus in MPC-BE for use with the **madVR video renderer**.
-The second Windows x64 portable [prerelease is available](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.2)
+The Windows x64 portable [prerelease 1.9.1-bluray.3 is available](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.3)
 for testing alongside an existing MPC-BE. Priorities may change with feedback;
 items below are not promised release dates or compatibility guarantees.
 
@@ -114,11 +114,17 @@ The published first-release ZIP remains unchanged. Detailed changes are in the
   candidate passed direct ISO opening, both introductory clips, menu, film,
   top-menu return and release of the image when closing the disc.
 
+## 1.9.1-bluray.3 release checks
+
+- [x] Verify D3D11 native transitions with madVR on the affected HDMV disc and on BD-J.
+- [x] Compare feature seek-bar marks with the chapter positions on both discs.
+- [x] Check RU/EN first run and publish the tested cloud ZIP and checksum.
+
+The [development guide](docs/en/DEVELOPMENT.md#third-prerelease) records the build,
+disc scenarios and result for each format.
+
 ## After initial feedback
 
-- Qualify the 1.9.1-bluray.3 cloud ZIP with madVR and D3D11 native on HDMV
-  and BD-J discs. Check intro-to-menu and film transitions, pop-up and top menus,
-  and chapter marks on the feature timeline with a fresh portable profile.
 - Prioritize reproducible menu, playback, data-isolation and crash regressions.
 - Maintain a compact compatibility record that names the tested player build,
   madVR/Java versions, disc edition and exact scenarios rather than declaring a

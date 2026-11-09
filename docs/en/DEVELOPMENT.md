@@ -35,7 +35,7 @@ has been replaced by the official release; the fork version has no `dev` suffix.
 
 Use `main` for reviewed, tested code, with short `feature/`, `fix/` and `update/`
 branches. A permanent develop branch is not needed. The source repository is
-public; [1.9.1-bluray.2](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.2) is available as a prerelease.
+public. The current prerelease is [1.9.1-bluray.3](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.3).
 
 ## Branches and release flow
 
@@ -245,6 +245,27 @@ closed. The original crash disc, full-film playback, all-disc compatibility,
 stereoscopic output and broader HDR accuracy were not revalidated in this run.
 The reader fix also has 320 guarded-read cases and prior local disc checks;
 those remain distinct from this archive's playback evidence.
+
+## Third prerelease
+
+[Build 42634398294](https://github.com/ttonych/mpc-be_bluray/actions/runs/42634398294) produced the portable x64 ZIP for commit
+`d1b36d8650db1486947a1e5187470d2eb32e9317`. Both public assets matched the
+tested downloads and the tag resolved to the build commit on 2026-11-09.
+The ZIP SHA-256 is `a576e437f62e99e29f71fc0f0707e8b0522e7cf701eec4904c9d258598aa41d6`.
+
+The 45-file archive passed manifest, clean-profile and offline-link checks.
+First-run setup completed in Russian and English on separate extractions.
+With madVR and the internal D3D11 native decoder, the player started each
+feature from the disc menu, opened the pop-up and returned to the top menu.
+
+| Disc | Native connections on one device | Interior seek-bar marks matching the playlist |
+| --- | ---: | ---: |
+| The Outpost (HDMV) | 8 | 16 of 16 |
+| Memoirs of a Geisha (BD-J with Temurin 21 x64) | 5 | 15 of 15 |
+
+Playback state and navigation logs confirmed the transitions. Captures of the
+seek bar confirmed the marks during feature playback and their absence in the
+top menu. Testing covered short playback samples on one graphics adapter.
 
 ## Updating MPC-BE
 

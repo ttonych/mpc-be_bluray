@@ -322,7 +322,7 @@ bool CHistoryFile::WriteFile()
 	return ret;
 }
 
-bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
+bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos, bool bReadTitle)
 {
 	std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -350,7 +350,7 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
 			}
 		}
 
-		if (!si.Title.IsEmpty()) {
+		if (bReadTitle && !si.Title.IsEmpty()) {
 			sesInfo.Title = si.Title;
 		}
 	}
@@ -365,6 +365,10 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
 		while (m_SessionInfos.size() > m_maxCount) {
 			m_SessionInfos.pop_back();
 		}
+		WriteFile();
+	} else if (!bReadTitle && it->Title != sesInfo.Title) {
+		// The most recent entry stays in place. Refresh just its disc title.
+		it->Title = sesInfo.Title;
 		WriteFile();
 	}
 

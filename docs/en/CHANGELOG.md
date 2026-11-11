@@ -5,7 +5,7 @@
 This file covers this fork. The original MPC-BE history remains in
 [Changelog.txt](../Changelog.txt).
 
-## Unreleased
+## 1.9.1-bluray.4
 
 - Fixed the seek bar showing the previous Blu-ray’s title when a new disc used
   the same drive and playlist number. The current disc supplies the title for

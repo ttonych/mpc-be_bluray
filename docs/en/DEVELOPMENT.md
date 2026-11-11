@@ -35,7 +35,7 @@ has been replaced by the official release; the fork version has no `dev` suffix.
 
 Use `main` for reviewed, tested code, with short `feature/`, `fix/` and `update/`
 branches. A permanent develop branch is not needed. The source repository is
-public. The current prerelease is [1.9.1-bluray.3](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.3).
+public. The current prerelease is [1.9.1-bluray.4](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.4).
 
 ## Branches and release flow
 
@@ -266,6 +266,16 @@ feature from the disc menu, opened the pop-up and returned to the top menu.
 Playback state and navigation logs confirmed the transitions. Captures of the
 seek bar confirmed the marks during feature playback and their absence in the
 top menu. Testing covered short playback samples on one graphics adapter.
+
+## Fourth prerelease
+
+[Build 42995633999](https://github.com/ttonych/mpc-be_bluray/actions/runs/42995633999) produced the portable x64 archive for commit `5ea941fb0d42c9a307937cc3cdb5475f58a30488`.
+The public ZIP and checksum matched the tested draft. ZIP SHA-256 is `460a00278b76b40f875ca1864478a596848d314c3d40f792eff4e2f2705fffdb`.
+
+The 45-file archive passed manifest and offline-guide checks. First-run setup completed in Russian and English on clean profiles.
+With madVR and history enabled, the same player reopened the same playlist path after a switch from *Anyone but You* to *The Outpost*. The seek bar and the history entry both showed the second title. The published .3 build kept the first title under the same conditions.
+
+BD-J startup with Java 21, the first menu playlist and direct feature playback were checked on *Anyone but You*. On *The Outpost* (HDMV), the player started the feature from the menu, opened the pop-up and returned to the top menu. The timeline matched all 16 interior chapter marks. Testing covered short playback samples.
 
 ## Updating MPC-BE
 

@@ -3,7 +3,7 @@
 [Русский](ROADMAP.ru.md) · [Overview](README.md) · [Changelog](docs/en/CHANGELOG.md)
 
 The project adapts Blu-ray menus in MPC-BE for use with the **madVR video renderer**.
-The Windows x64 portable [prerelease 1.9.1-bluray.3 is available](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.3)
+The Windows x64 portable [prerelease 1.9.1-bluray.4 is available](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.4)
 for testing alongside an existing MPC-BE. Priorities may change with feedback;
 items below are not promised release dates or compatibility guarantees.
 
@@ -122,6 +122,13 @@ The published first-release ZIP remains unchanged. Detailed changes are in the
 
 The [development guide](docs/en/DEVELOPMENT.md#third-prerelease) records the build,
 disc scenarios and result for each format.
+
+## 1.9.1-bluray.4 release checks
+
+- [x] Reopen the same playlist path on two different discs in one session and verify the title on the seek bar and in history.
+- [x] Check clean English and Russian profiles, BD-J with Java 21 and HDMV navigation with madVR on the published build.
+
+The [developer guide](docs/en/DEVELOPMENT.md#fourth-prerelease) records the build and disc checks.
 
 ## After initial feedback
 

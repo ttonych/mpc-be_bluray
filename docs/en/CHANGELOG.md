@@ -5,6 +5,12 @@
 This file covers this fork. The original MPC-BE history remains in
 [Changelog.txt](../Changelog.txt).
 
+## Unreleased
+
+- Fixed the seek bar showing the previous Blu-ray’s title when a new disc used
+  the same drive and playlist number. The current disc supplies the title for
+  menu playback and direct playlist playback even when history is enabled.
+
 ## 1.9.1-bluray.3
 
 - Fixed a madVR crash when a Blu-ray menu switched playlists with the internal

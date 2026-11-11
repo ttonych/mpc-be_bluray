@@ -121,7 +121,7 @@ private:
 	bool WriteFile();
 
 public:
-	bool OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos); // Read or create an entry in the history file
+	bool OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos, bool bReadTitle = true); // Read or create an entry in the history file
 	void SaveSessionInfo(const SessionInfo& sesInfo);
 	bool DeleteSessions(const std::list<SessionInfo>& sessions);
 

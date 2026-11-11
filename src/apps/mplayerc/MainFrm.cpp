@@ -12818,7 +12818,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD, const CStringW& youtubeUrl)
 			if (s.bKeepHistory) {
 				// read file position from history
 				auto& historyFile = AfxGetMyApp()->m_HistoryFile;
-				bool found = historyFile.OpenSessionInfo(m_SessionInfo, s.bRememberFilePos);
+				// Different Blu-rays can use the same drive and playlist path or BD-J canvas.
+				const bool readHistoryTitle = !m_blurayMenu && m_LastOpenBDPath.IsEmpty();
+				bool found = historyFile.OpenSessionInfo(m_SessionInfo, s.bRememberFilePos, readHistoryTitle);
 
 				if (found && s.bRememberFilePos) {
 					// restore file position and track numbers

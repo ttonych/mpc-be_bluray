@@ -35,7 +35,7 @@ has been replaced by the official release; the fork version has no `dev` suffix.
 
 Use `main` for reviewed, tested code, with short `feature/`, `fix/` and `update/`
 branches. A permanent develop branch is not needed. The source repository is
-public. The current prerelease is [1.9.1-bluray.4](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.4).
+public. The current prerelease is [1.9.1-bluray.5](https://github.com/ttonych/mpc-be_bluray/releases/tag/1.9.1-bluray.5).
 
 ## Branches and release flow
 
@@ -276,6 +276,14 @@ The 45-file archive passed manifest and offline-guide checks. First-run setup co
 With madVR and history enabled, the same player reopened the same playlist path after a switch from *Anyone but You* to *The Outpost*. The seek bar and the history entry both showed the second title. The published .3 build kept the first title under the same conditions.
 
 BD-J startup with Java 21, the first menu playlist and direct feature playback were checked on *Anyone but You*. On *The Outpost* (HDMV), the player started the feature from the menu, opened the pop-up and returned to the top menu. The timeline matched all 16 interior chapter marks. Testing covered short playback samples.
+
+## Fifth prerelease
+
+[Build 43189486550](https://github.com/ttonych/mpc-be_bluray/actions/runs/43189486550) built commit `b42b8d4d9e11ffb04b4cf97eba99e63e7eff9f10`. The public ZIP and checksum matched the validated draft assets. ZIP SHA-256 is `3fc26ef136305cebc6f7650feab5aa528d75b8e3de6ad7a8e47181b97d4d5967`.
+
+The 47-file archive passed manifest and offline-link checks. First-run setup passed in clean Russian and English profiles. The container repaint regression passed against the packaged JAR.
+
+Both original ISO images were opened as read-only BDMV folders. On *Anyone but You* with madVR and Java 21, the panel cleared after three chapter choices from the top menu and one from the pop-up. On *The Outpost* (HDMV), the feature started, the pop-up opened and navigation returned to the top menu. All 16 interior timeline marks matched the chapter positions on each disc. Reopening the same playlist path after switching discs updated the title in the player and in history. These checks used short playback samples.
 
 ## Updating MPC-BE
 

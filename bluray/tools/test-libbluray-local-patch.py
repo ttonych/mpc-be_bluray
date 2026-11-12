@@ -9,7 +9,7 @@ from datetime import datetime
 
 root = Path(__file__).resolve().parent.parent
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--component', choices=['native', 'mouse-page', 'bdj-toggle'], default='mouse-page')
+parser.add_argument('--component', choices=['native', 'mouse-page', 'bdj-toggle', 'bdj-container-repaint'], default='mouse-page')
 args = parser.parse_args()
 target = root / 'diagnostics' / 'fixtures' / ('patch-rebuild-' + args.component + '-' + datetime.now().strftime('%Y%m%d-%H%M%S'))
 first = 'mouse-page' if args.component == 'native' else args.component

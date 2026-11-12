@@ -8,6 +8,18 @@ changes for this integration, whose menu output is adapted for madVR.
 Before the first check, complete the [full local build](../../docs/en/DEVELOPMENT.md#local-build):
 rebuilding the player below requires both the native DLL and the two JARs.
 
+## HAVi container repaint
+
+`bdj-container-repaint-v1` fixes scene thumbnails remaining over a film after
+a BD-J application removes the scene menu. The HAVi container requests a
+repaint of the removed component's bounds. Removing all children schedules a
+repaint of the visible container. The parent then paints the remaining controls.
+The patch is in the main BD-J JAR.
+
+The component suite runs `ContainerRepaintTest.java` against the built JAR.
+On *Anyone but You*, select Scenes from the top menu, choose a chapter, then
+open the pop-up and return to the top menu.
+
 ## Navigation: playmark-seek-v1 (2026-09-22)
 
 After a seek, the original tracker skipped marks at exactly the next packet to

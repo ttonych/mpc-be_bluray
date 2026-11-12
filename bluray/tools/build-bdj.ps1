@@ -7,8 +7,11 @@ if (!$JavaHome -or !(Test-Path -LiteralPath (Join-Path $JavaHome 'bin\javac.exe'
     throw 'Pass -JavaHome with a JDK containing bin/javac.exe (tested with JDK 21). A JRE alone cannot compile the JARs.'
 }
 $javaRoot = (Resolve-Path -LiteralPath $JavaHome).Path
-& python (Join-Path $PSScriptRoot 'libbluray-local-patch.py') --component bdj-toggle
-if ($LASTEXITCODE) { throw 'BD-J source patch validation failed.' }
+$patches = @('bdj-toggle', 'bdj-container-repaint')
+foreach ($patch in $patches) {
+    & python (Join-Path $PSScriptRoot 'libbluray-local-patch.py') --component $patch
+    if ($LASTEXITCODE) { throw "BD-J source patch validation failed: $patch" }
+}
 $antRoot = Join-Path $PSScriptRoot 'apache-ant-1.10.18'
 $packages = @(
     @{ Name='apache-ant-1.10.18-bin.zip'; Url='https://downloads.apache.org/ant/binaries/apache-ant-1.10.18-bin.zip'; Algorithm='SHA512'; Hash='f86d7b263bc7c6903a91532943f1c8ecccc17dd999851a796617e79795908d7a666cbe999b9ecf06735cc7e830f50dca9f49b37bb5f6f02a0a3803cd22b558b0'; Target=$antRoot }
@@ -36,8 +39,10 @@ try {
     if ($LASTEXITCODE) { throw 'BD-J Java build failed.' }
     [ordered]@{
         libbluray='1.5.0'; javac=$compilerVersion.Trim(); ant='1.10.18'
-        local_revision='bdj-toggle-v1'
-        local_patch_sha256=(Get-FileHash -LiteralPath (Join-Path $workspace 'patches\libbluray-1.5.0-bdj-toggle.patch') -Algorithm SHA256).Hash.ToLowerInvariant()
+        local_patches=@(foreach ($patch in $patches) {
+            $manifest = Get-Content -LiteralPath (Join-Path $workspace "patches/libbluray-1.5.0-$patch.json") -Raw | ConvertFrom-Json
+            @{component=$patch; revision=$manifest.local_revision; sha256=$manifest.patch_sha256}
+        })
         built_utc=[DateTime]::UtcNow.ToString('o')
         packages=@($packages | ForEach-Object { @{name=$_.Name;url=$_.Url;algorithm=$_.Algorithm;hash=$_.Hash} })
         jars=@(Get-ChildItem -LiteralPath $dist -Filter '*.jar' | ForEach-Object { @{name=$_.Name;sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()} })

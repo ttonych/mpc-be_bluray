@@ -1,0 +1,12 @@
+{
+  "upstream": "1.5.0",
+  "local_revision": "bdj-container-repaint-v1",
+  "source_sha256": "f676408e91a5d321abf8b8d4dfdae36205c297dab5c54c3ec519639025f474a2",
+  "files": {
+    "src/libbluray/bdj/java/org/havi/ui/HContainer.java": {
+      "base": "e6618a530972f08fbe6748e4cd6508d9989e4798c12a8e4c0b86037cde854700",
+      "patched": "2fa37f29f1f320c3bd8cc9e40d649e556e00e34b26163aa7ac057b06d6ad4a31"
+    }
+  },
+  "patch_sha256": "a519ccd2295f85a81e20e40e0264723ee58e700e4734210205e573cc81942609"
+}

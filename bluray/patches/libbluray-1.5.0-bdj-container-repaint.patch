@@ -1,0 +1,39 @@
+--- a/src/libbluray/bdj/java/org/havi/ui/HContainer.java
++++ b/src/libbluray/bdj/java/org/havi/ui/HContainer.java
+@@ -21,6 +21,7 @@
+ 
+ import java.awt.Component;
+ import java.awt.Container;
++import java.awt.Rectangle;
+ import org.dvb.ui.TestOpacity;
+ 
+ //https://www.jinahya.com/mvn/site/com.googlecode.jinahya/ocap-api/1.3.1/apidocs/org/havi/ui/HContainer.html
+@@ -62,6 +63,28 @@
+ 
+     private void checkLineage(java.awt.Component c) {
+         if (c.getParent() != this) throw new ArrayIndexOutOfBoundsException("Component not contained within");
++    }
++
++    // Repaint the exposed parent area after removing a lightweight menu.
++    public void remove(int index) {
++        synchronized (getTreeLock()) {
++            Component old = getComponent(index);
++            Rectangle exposed = old.isShowing() ? old.getBounds() : null;
++            super.remove(index);
++            if (exposed != null) {
++                repaint(exposed.x, exposed.y, exposed.width, exposed.height);
++            }
++        }
++    }
++
++    public void removeAll() {
++        synchronized (getTreeLock()) {
++            boolean exposed = isShowing() && getComponentCount() != 0;
++            super.removeAll();
++            if (exposed) {
++                repaint();
++            }
++        }
+     }
+ 
+     public Component addBefore(Component component, Component behind) {

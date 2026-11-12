@@ -5,6 +5,11 @@
 This file covers this fork. The original MPC-BE history remains in
 [Changelog.txt](../Changelog.txt).
 
+## 1.9.1-bluray.5
+
+- Fixed the BD-J scene-selection panel remaining over the film when a chapter
+  starts playing.
+
 ## 1.9.1-bluray.4
 
 - Fixed the seek bar showing the previous Blu-ray’s title when a new disc used

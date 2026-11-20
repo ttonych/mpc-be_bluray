@@ -8,6 +8,24 @@ changes for this integration, whose menu output is adapted for madVR.
 Before the first check, complete the [full local build](../../docs/en/DEVELOPMENT.md#local-build):
 rebuilding the player below requires both the native DLL and the two JARs.
 
+## BD-J UHD video size
+
+`bdj-uhd-size-v1` fixes `StreamInfo.getVideoSize()` returning `null` for UHD
+format `0x08`. The missing `break` let the 3840×2160 case fall through to the
+unknown-format branch. BD-J applications using `VideoControl.setClipRegion()`
+could then throw a `NullPointerException` when starting UHD playback.
+
+The patch, checksum manifest and `VideoSizeTest.java` were ported unchanged from
+[MPC-HC Blu-ray commit 8844c486d77f0493614fbd143cbf4d6e69b97c8a](https://github.com/ttonych/mpc-hc_bluray/commit/8844c486d77f0493614fbd143cbf4d6e69b97c8a).
+The patch changes the main BD-J JAR and is independent of the other local patches.
+`build-bdj.ps1` verifies and applies it; `test-components.ps1` tests UHD, HD and
+unknown formats against the built JAR, plus clean/repeated patch application and
+refusal to overwrite unexpected source edits.
+
+The regression reproduces the UHD failure with the released MPC-BE `.5` JAR.
+The patched JAR passes. Playback on an affected UHD disc in MPC-BE still needs
+validation before a release; MPC-HC playback results are not MPC-BE test results.
+
 ## HAVi container repaint
 
 `bdj-container-repaint-v1` fixes scene thumbnails remaining over a film after

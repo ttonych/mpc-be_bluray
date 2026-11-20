@@ -5,6 +5,11 @@
 This file covers this fork. The original MPC-BE history remains in
 [Changelog.txt](../Changelog.txt).
 
+## Unreleased
+
+- Fixed the UHD video size reported to BD-J applications, preventing a null-size
+  error when a disc menu sets the video region before UHD playback.
+
 ## 1.9.1-bluray.5
 
 - Fixed the BD-J scene-selection panel remaining over the film when a chapter

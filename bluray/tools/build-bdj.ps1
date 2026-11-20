@@ -7,7 +7,7 @@ if (!$JavaHome -or !(Test-Path -LiteralPath (Join-Path $JavaHome 'bin\javac.exe'
     throw 'Pass -JavaHome with a JDK containing bin/javac.exe (tested with JDK 21). A JRE alone cannot compile the JARs.'
 }
 $javaRoot = (Resolve-Path -LiteralPath $JavaHome).Path
-$patches = @('bdj-toggle', 'bdj-container-repaint')
+$patches = @('bdj-toggle', 'bdj-container-repaint', 'bdj-uhd-size')
 foreach ($patch in $patches) {
     & python (Join-Path $PSScriptRoot 'libbluray-local-patch.py') --component $patch
     if ($LASTEXITCODE) { throw "BD-J source patch validation failed: $patch" }

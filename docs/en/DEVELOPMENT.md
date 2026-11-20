@@ -116,7 +116,8 @@ It is not the mode used for the initial public test package.
 ## Checks and packaging
 
 `test-components.ps1` runs the synthetic C++ checks, native/Java patch regression suites,
-HAVi tests against the built JAR, and publication-checker tests. It needs no disc.
+HAVi and UHD/HD video-size tests against the built JAR, and publication-checker
+tests. It needs no disc.
 Disc-specific probes include `test-mouse-submenus.ps1 -Disc 'V:\'` for Baby Boom
 and `test-menu-background.ps1 -KingdomDisc 'V:\'` for The Kingdom. Use the matching
 disc; these are not generic disc validators. `test-hdmv.ps1 -Disc 'V:\'` exercises

@@ -1,0 +1,10 @@
+--- a/src/libbluray/bdj/java/org/videolan/StreamInfo.java
++++ b/src/libbluray/bdj/java/org/videolan/StreamInfo.java
+@@ -73,6 +73,7 @@
+         case (byte)0x08:
+             width = 3840;
+             height = 2160;
++            break;
+         default:
+                 return null;
+         }

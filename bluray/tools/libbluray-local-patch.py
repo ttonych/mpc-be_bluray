@@ -113,7 +113,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, default=ROOT / 'vendor/libbluray-1.5.0')
     parser.add_argument('--export', action='store_true')
-    parser.add_argument('--component', choices=['native', 'mouse-page', 'playmark-seek', 'bdj-toggle', 'bdj-container-repaint'], default='mouse-page')
+    parser.add_argument('--component', choices=['native', 'mouse-page', 'playmark-seek', 'bdj-toggle', 'bdj-container-repaint', 'bdj-uhd-size'], default='mouse-page')
     parser.add_argument('--base-source', type=Path)
     args = parser.parse_args()
     if args.component == 'bdj-toggle':
@@ -127,6 +127,11 @@ if __name__ == '__main__':
         PATCH = ROOT / 'patches/libbluray-1.5.0-bdj-container-repaint.patch'
         MANIFEST = PATCH.with_suffix('.json')
         REVISION = 'bdj-container-repaint-v1'
+    elif args.component == 'bdj-uhd-size':
+        FILES = ['src/libbluray/bdj/java/org/videolan/StreamInfo.java']
+        PATCH = ROOT / 'patches/libbluray-1.5.0-bdj-uhd-size.patch'
+        MANIFEST = PATCH.with_suffix('.json')
+        REVISION = 'bdj-uhd-size-v1'
     elif args.component == 'playmark-seek':
         FILES = ['src/libbluray/bluray.c']
         PATCH = ROOT / 'patches/libbluray-1.5.0-playmark-seek.patch'

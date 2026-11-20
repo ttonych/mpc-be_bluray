@@ -1,0 +1,12 @@
+{
+  "upstream": "1.5.0",
+  "local_revision": "bdj-uhd-size-v1",
+  "source_sha256": "f676408e91a5d321abf8b8d4dfdae36205c297dab5c54c3ec519639025f474a2",
+  "files": {
+    "src/libbluray/bdj/java/org/videolan/StreamInfo.java": {
+      "base": "bb982ea772b3cdab13fc51f939ebc3f035940c366879f2c256e052cc36fa02b8",
+      "patched": "5cf816e9e05a3631ae601418101f3d6d0a12d994b87d553cf494a1550d830694"
+    }
+  },
+  "patch_sha256": "8417dd52f19378f283cf331bbeed9fde0ccd0e6b87c2b78c2b02028012d05f46"
+}

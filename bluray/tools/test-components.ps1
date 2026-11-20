@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 foreach ($name in @('bdj-argb','disc-storage','media-monitor','menu-background','menu-audio','file-retry','java-runtime','menu-color','menu-coordinates','menu-rle','playback-clock','portable-profile','release-version')) {
     & (Join-Path $PSScriptRoot "test-$name.ps1")
 }
-foreach ($component in @('mouse-page','native','bdj-toggle','bdj-container-repaint')) {
+foreach ($component in @('mouse-page','native','bdj-toggle','bdj-container-repaint','bdj-uhd-size')) {
     python (Join-Path $PSScriptRoot 'test-libbluray-local-patch.py') --component $component
     if ($LASTEXITCODE) { throw "Patch regression failed: $component" }
 }
@@ -15,5 +15,7 @@ foreach ($name in @('process-query-hook', 'playmark-seek')) {
 $bdjJar = Join-Path $PSScriptRoot '../out/libbluray-1.5.0-x64/share/java/libbluray-j2se-1.5.0.jar'
 & (Join-Path $JavaHome 'bin/java.exe') '-Djava.awt.headless=true' -cp $bdjJar (Join-Path $PSScriptRoot '../probe/ContainerRepaintTest.java')
 if ($LASTEXITCODE) { throw 'HAVi container repaint regression failed.' }
+& (Join-Path $JavaHome 'bin/java.exe') '-Djava.awt.headless=true' -cp $bdjJar (Join-Path $PSScriptRoot '../probe/VideoSizeTest.java')
+if ($LASTEXITCODE) { throw 'BD-J video size regression failed.' }
 python (Join-Path $PSScriptRoot 'test-public-check.py')
 if ($LASTEXITCODE) { throw 'Publication checker regression failed.' }

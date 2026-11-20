@@ -7,6 +7,13 @@ The Windows x64 portable [prerelease 1.9.1-bluray.5 is available](https://github
 for testing alongside an existing MPC-BE. Priorities may change with feedback;
 items below are not promised release dates or compatibility guarantees.
 
+## Changes awaiting the next release
+
+- [x] Port `bdj-uhd-size-v1` with checksum validation and UHD/HD/unknown-format
+  regression coverage against the built JAR.
+- [ ] Validate playback on an affected UHD BD-J disc in MPC-BE with madVR before
+  including the fix in the next release. The published `.5` does not contain it.
+
 ## Current baseline
 
 - [x] Port the integration to the official MPC-BE 1.9.1 release base.
